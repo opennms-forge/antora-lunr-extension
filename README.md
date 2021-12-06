@@ -1,78 +1,53 @@
-# Integration of Lunr in Antora
-
-[![Pipeline status](https://gitlab.com/antora/antora-lunr-extension/badges/main/pipeline.svg)](https://gitlab.com/antora/antora-lunr-extension/-/commits/main)
-[![npm](https://img.shields.io/npm/v/antora-lunr.svg)](https://www.npmjs.org/package/antora-lunr)
+# Antora Lunr Extension
 
 [Lunr](https://lunrjs.com/) provides a great search experience without the need for external, server-side, search services.
-It makes it possible to add an *offline* search engine in your Antora's documentation site.
+It makes it possible to add an *offline* search engine to your Antora documentation site.
 
-## Usage
+:information_source: **NOTE:** The Antora Extension for Lunr is compatible with [Antora 3.0 and newer](https://docs.antora.org/antora/3.0/whats-new/).
 
-### Generate an index file
+# Usage
 
-To integrate Lunr in Antora, we can either use a custom site generator pipeline that includes Lunr or modify your current site generator pipeline.
+## Install the Antora extension
 
-**TIP:**
-To make things easier, we provide a copy of the default site generator that in addition produces a Lunr index. Learn how to [install and use this generator](https://github.com/Mogztter/antora-site-generator-lunr).
+The first step towards integrating Lunr with your Antora playbook is to install the package and [register it as an Antora extension](https://docs.antora.org/antora/3.0/extend/register-extension/).
 
-**NOTE:**
-The following instructions only apply if you are using the default pipeline.
-If you are using a custom pipeline, the logic remains the same but you will have to find yourself where the `generateSite` function should be added.
-
-Antora provides a default pipeline named `@antora/site-generator-default`.
-Make sure that it's installed using the command `npm list --depth 0`.
-If you don't find the module in the result then it's probably installed globally.
-Add the `-g` flag and execute the command again:
-
-```
-npm list -g --depth 0
-/usr/local/lib
-├── @antora/cli@2.0.0
-├── @antora/site-generator-default@2.0.0
-└── npm@6.5.0
-```
-
-As you can see in the example above, the module is installed globally in _/usr/local/lib_.
-The `node_modules` folder will be either at the root of your project or in your global libraries folder: _/usr/local/lib/node_modules_.
-
-Once you've located the module, edit the file `node_modules/@antora/site-generator-default/lib/generate-site.js` adding after `use strict`:
-
-```js
-const generateIndex = require('antora-lunr')
-```
-
-In the `generateSite` function add the following two lines after `const siteFiles = mapSite(playbook, pages).concat(produceRedirects(playbook, contentCatalog))`:
-
-```js
-const index = generateIndex(playbook, pages, contentCatalog, env)
-siteFiles.push(generateIndex.createIndexFile(index))
-```
-
-Install this module:
+Install the extension:
 
 ```console
-$ npm i antora-lunr
+$ npm install https://gitlab.com/antora/antora-lunr-extension
 ```
 
-**NOTE**:
-If Antora is installed globally, you should also add this module globally using the `-g` flag:
+:bulb: **TIP**: While we recommend using local dependencies rather than global, you *can* install the extension globally if you add the `-g` flag.
 
 ```console
-$ npm i -g antora-lunr
+$ npm install -g https://gitlab.com/antora/antora-lunr-extension
 ```
 
-When generating your documentation site again, an index file will be created at the root of your output directory,
-which depends on the value of `output.dir` in your playbook.
-For the [default output dir](https://docs.antora.org/antora/2.0/playbook/configure-output/#default-output-dir),
-that will be `build/site/search-index.js`.
+## Generate an index file
 
-### Enable the search component in the UI
+To integrate Lunr in Antora as an extension, we register the package in the `antora-playbook.yml`.
+
+We assume the name of your playbook is `antora-playbook.yml`.
+Open the [Antora playbook](https://docs.antora.org/antora/3.0/playbook/), and add the extension.
+
+```yaml
+# antora-playbook.yml
+antora:
+  extensions:
+    - require: '@antora/antora-lunr-extension'
+```
+
+When generating your documentation site again, an index file will be created at the root of your output directory, which depends on the value of `output.dir` in your playbook.
+For the [default output dir](https://docs.antora.org/antora/3.0/playbook/configure-output/#default-output-dir), that will be `build/site/search-index.js`.
+
+## Enable the search component in the UI
 
 Now that we have a `search-index.js`, we need to enable the search component in the UI.
 
-Copy the `supplemental_ui` directory from the npm package *node_modules/antora-lunr/supplemental_ui* in your Antora playbook repository and configure a `supplemental_files`:
+Copy the `supplemental_ui` directory from the npm package `node_modules/@antora/antora-lunr-extension/supplemental_ui` in your Antora playbook repository and configure a `ui.supplemental_files`:
 
-```yml
+```yaml
+# antora-playbook.yml
 ui:
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
@@ -80,89 +55,96 @@ ui:
   supplemental_files: ./supplemental_ui
 ```
 
-**NOTE:** For this to function correctly you must provide the `site.url` key in your playbook file.
-See the Antora docs on the [playbook schema](https://docs.antora.org/antora/1.1/playbook/playbook-schema/).
-If using the site locally (not serving from a web server) then you can set your `site.url` to a `file://` reference, e.g. `file:///home/documents/antora/website/public/`.
 
-**TIP:** If you are using [serve](https://www.npmjs.com/package/serve) HTTP server to view your site locally,
-set the `site.url` to `http://localhost:5000`.
+:information_source: **NOTE**: For this to function correctly you must provide the `site.url` key in your playbook file.
+See the Antora docs on the [playbook UI keys](https://docs.antora.org/antora/3.0/playbook/configure-ui/).
+If using the site locally (not serving from a web server) then you can set your `site.url` to a `file://` reference, e.g. `file:///home/documents/antora/website/public/`.
 
-### Generate the site
+:bulb: **TIP**: If you are using [`serve`](https://www.npmjs.com/package/serve) HTTP server to view your site locally, set the `site.url` to `http://localhost:5000`.
 
-Generate your documentation site with the following environment variables:
+## Generate the site
 
-* `DOCSEARCH_ENABLED=true`
-* `DOCSEARCH_ENGINE=lunr`
-
-For instance, as a command line:
+Generate your documentation site using Antora.
+For instance, via the command line:
 
 ```console
-$ DOCSEARCH_ENABLED=true DOCSEARCH_ENGINE=lunr antora site.yml
+$ antora generate antora-playbook.yml
 ```
 
-### Configuration
+# Configuration
 
-#### Index only the latest version
+:rotating_light: **IMPORTANT**: In earlier versions configuration was performed with environment variables.
+This has been replaced with configuring the extension via the playbook.
 
-To index only the latest (released) version, set the following environment variable:
+## Index only the latest version
 
-* `DOCSEARCH_INDEX_VERSION=latest`
+To index only the latest (released) version, set the `indexLatestOnly` configuration key:
 
-For instance, as a command line:
-
-```console
-$ DOCSEARCH_ENABLED=true DOCSEARCH_ENGINE=lunr DOCSEARCH_INDEX_VERSION=latest antora site.yml
+```yaml
+# antora-playbook.yml
+antora:
+  extensions:
+    - require: '@antora/antora-lunr-extension'
+      indexLatestOnly: true
 ```
 
-#### Support for other languages
+By default the extension indexes all the versions of your documentation components.
 
-By default, Lunr support only English language.
+## Support for other languages
+
+By default, Lunr only supports English as an indexing language.
 You can add support for the following other languages:
 
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/IQ.png) Arabic (ar)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/CN.png) Chinese (zh)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/DK.png) Danish (da)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/NL.png) Dutch (nl)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/FI.png) Finnish (fi)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/FR.png) French (fr)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/DE.png) German (de)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/IN.png) Hindi (hi)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/HU.png) Hungarian (hu)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/IT.png) Italian (it)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/JP.png) Japanese (ja)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/NO.png) Norwegian (no)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/PT.png) Portuguese (pt)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/RO.png) Romanian (ro)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/RU.png) Russian (ru)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/ES.png) Spanish (es)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/SE.png) Swedish (sv)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/TH.png) Thai (th)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/TR.png) Turkish (tr)
-* ![](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/VN.png) Vietnamese (vi)
+- ![ar](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/IQ.png) Arabic (ar)
+- ![zh](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/CN.png) Chinese (zh)
+- ![da](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/DK.png) Danish (da)
+- ![nl](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/NL.png) Dutch (nl)
+- ![fi](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/FI.png) Finnish (fi)
+- ![fr](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/FR.png) French (fr)
+- ![de](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/DE.png) German (de)
+- ![hi](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/IN.png) Hindi (hi)
+- ![hu](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/HU.png) Hungarian (hu)
+- ![it](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/IT.png) Italian (it)
+- ![ja](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/JP.png) Japanese (ja)
+- ![no](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/NO.png) Norwegian (no)
+- ![pt](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/PT.png) Portuguese (pt)
+- ![ro](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/RO.png) Romanian (ro)
+- ![ru](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/RU.png) Russian (ru)
+- ![es](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/ES.png) Spanish (es)
+- ![sv](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/SE.png) Swedish (sv)
+- ![th](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/TH.png) Thai (th)
+- ![tr](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/TR.png) Turkish (tr)
+- ![vi](https://raw.githubusercontent.com/madebybowtie/FlagKit/master/Assets/PNG/VN.png) Vietnamese (vi)
 
-**IMPORTANT:** To use Chinese language, you need to install `nodejieba` dependency:
 
-   $ npm i nodejieba
-
-To use one or more languages, set the `DOCSEARCH_LANGS` environment variable with all desired language codes (comma separated):
-
-* `DOCSEARCH_LANGS=en,fr`
-
-For instance, as a command line:
+:rotating_light: **IMPORTANT**: To use Chinese language, you need to install `nodejieba` dependency:
 
 ```console
-$ DOCSEARCH_ENABLED=true DOCSEARCH_ENGINE=lunr DOCSEARCH_LANGS=en,fr antora site.yml
+$ npm install nodejieba
 ```
 
-### Testing this module
+To use one or more languages, set the `languages` configuration key with all the desired language codes as a list:
 
-In the root of the repository, run `npm t`.
+```yaml
+# antora-playbook.yml
+antora:
+  extensions:
+    - require: '@antora/antora-lunr-extension'
+      languages: [en, fr]
+```
 
-## Who's using it
+## Testing this module
 
-Here's a list of projects who are using Antora Lunr.   
-To add your project to this list, please [edit this page](https://github.com/Mogztter/antora-lunr/edit/main/README.md)!
+In the root of the repository, run `npm test`.
 
-- [Uyuni Documentation](https://www.uyuni-project.org/uyuni-docs/)
-- [SUSE Manager Documentation](https://documentation.suse.com/external-tree/en-us/suma/4.0/suse-manager/index.html)
-- [Commodore Components Hub (VSHN)](https://hub.syn.tools/hub/index.html)
+# Who’s using it
+
+Here’s a list of projects who are using Antora Lunr.
+To add your project to this list, please [edit this page](https://gitlab.com/antora/antora-lunr-extension/-/edit/main/README.adoc)!
+
+-   [Uyuni Documentation](https://www.uyuni-project.org/uyuni-docs/)
+
+-   [SUSE Manager Documentation](https://documentation.suse.com/external-tree/en-us/suma/4.0/suse-manager/index.html)
+
+-   [Commodore Components Hub (VSHN)](https://hub.syn.tools/hub/index.html)
+
