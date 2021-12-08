@@ -9,7 +9,7 @@ workflow:
     - if: '$CI_COMMIT_BRANCH'
 
 variables:
-  NODE_VERSION: 14
+  NODE_VERSION: 16
 
 .npm:
   image: node:${NODE_VERSION}
@@ -40,6 +40,4 @@ test:
   parallel:
     matrix:
       - NODE_VERSION:
-          - 12
-          - 14
           - 16

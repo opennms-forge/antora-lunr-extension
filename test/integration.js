@@ -7,7 +7,7 @@ const path = require('path')
 const dirtyChai = require('dirty-chai')
 chai.use(dirtyChai)
 
-const generateSite = require('@antora/site-generator-default')
+const generateSite = require('@antora/site-generator')
 
 describe('Generate site', () => {
   beforeEach(() => {

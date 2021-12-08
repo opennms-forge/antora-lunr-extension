@@ -34,7 +34,7 @@ Open the [Antora playbook](https://docs.antora.org/antora/3.0/playbook/), and ad
 # antora-playbook.yml
 antora:
   extensions:
-    - require: '@antora/antora-lunr-extension'
+    - require: '@antora/lunr-extension'
 ```
 
 When generating your documentation site again, an index file will be created at the root of your output directory, which depends on the value of `output.dir` in your playbook.
