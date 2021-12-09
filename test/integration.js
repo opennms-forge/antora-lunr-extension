@@ -7,12 +7,16 @@ const path = require('path')
 const dirtyChai = require('dirty-chai')
 chai.use(dirtyChai)
 
-const generateSite = require('@antora/site-generator-default')
+const generateSite = require('@antora/site-generator')
 
-describe('Generate site', () => {
+describe('Generate site', function () {
+  // Set timeout for each test to 30 seconds
+  this.timeout(30000)
+
   beforeEach(() => {
     rimrafSync(path.join(__dirname, 'docs/public'), (error) => { if (error) { throw error } })
   })
+
   it('should generate a site with a search index', async () => {
     // NOTE: While all configuration is passed along with the pipeline configuration, see playbook,
     //       the supplemental_ui and its' search field are dependant on the environment variables
