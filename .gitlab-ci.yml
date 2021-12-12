@@ -30,13 +30,15 @@ test:
   extends: .npm
   stage: test
   script:
-    - npm run ci:coverage
+    - npm run coverage
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
   artifacts:
     when: always
+    paths:
+      - coverage-report/lcov-report
     reports:
-      cobertura: coverage/cobertura-coverage.xml
-      junit: tests-xunit.xml
+      cobertura: coverage-report/cobertura-coverage.xml
+      junit: test-report/tests-xunit.xml
   parallel:
     matrix:
       - NODE_VERSION:
