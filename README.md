@@ -44,7 +44,7 @@ For the [default output dir](https://docs.antora.org/antora/3.0/playbook/configu
 
 Now that we have a `search-index.js`, we need to enable the search component in the UI.
 
-Copy the `supplemental_ui` directory from the npm package `node_modules/@antora/antora-lunr-extension/supplemental_ui` in your Antora playbook repository and configure a `ui.supplemental_files`:
+Copy the `supplemental_ui` directory from the npm package `node_modules/@antora/lunr-extension/supplemental_ui` in your Antora playbook repository and configure a `ui.supplemental_files`:
 
 ```yaml
 # antora-playbook.yml
@@ -84,7 +84,7 @@ To index only the latest (released) version, set the `indexLatestOnly` configura
 # antora-playbook.yml
 antora:
   extensions:
-    - require: '@antora/antora-lunr-extension'
+    - require: '@antora/lunr-extension'
       indexLatestOnly: true
 ```
 
@@ -129,7 +129,7 @@ To use one or more languages, set the `languages` configuration key with all the
 # antora-playbook.yml
 antora:
   extensions:
-    - require: '@antora/antora-lunr-extension'
+    - require: '@antora/lunr-extension'
       languages: [en, fr]
 ```
 
