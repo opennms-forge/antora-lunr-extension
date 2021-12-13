@@ -1,4 +1,4 @@
-node_modules/
-.nyc_output/
-coverage/cobertura-coverage.xml
-tests-xunit.xml
+/.nyc_output/
+/coverage-report/
+/node_modules/
+/test-report/

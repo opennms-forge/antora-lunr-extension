@@ -1,0 +1,4 @@
+= Antora x Lunr
+
+https://lunrjs.com[Lunr] provides a great search experience without the need for external, server-side, search services.
+With this extension, you can add an _offline_ search engine to your Antora documentation site.

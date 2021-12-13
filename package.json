@@ -14,10 +14,9 @@
     "node": ">=16.0.0"
   },
   "scripts": {
+    "coverage": "nyc _mocha",
     "lint": "standard test/**/*.js lib/**/*.js",
-    "test": "mocha",
-    "ci:test": "mocha --reporter xunit --reporter-option output=tests-xunit.xml",
-    "ci:coverage": "nyc --reporter text --reporter cobertura npm run ci:test"
+    "test": "_mocha"
   },
   "files": [
     "lib/",
@@ -36,6 +35,7 @@
     "lunr-languages": "~1.9"
   },
   "devDependencies": {
+    "@antora/logger": "3.0.0-rc.2",
     "@antora/site-generator": "3.0.0-rc.2",
     "chai": "~4.3",
     "dirty-chai": "~2.0",
@@ -43,5 +43,17 @@
     "mocha": "~9.1",
     "nyc": "~15.1",
     "standard": "~16.0"
+  },
+  "nyc": {
+    "cache": true,
+    "cacheDir": "node_modules/.cache/nyc",
+    "include": [
+      "lib/*.js"
+    ],
+    "reporter": [
+      "cobertura",
+      "lcov"
+    ],
+    "reportDir": "coverage-report"
   }
 }
