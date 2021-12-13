@@ -22,7 +22,7 @@ describe('generateSite()', () => {
     // NOTE: While all configuration is passed along with the pipeline configuration, see playbook,
     //       the supplemental_ui and its' search field are dependant on the environment variables
     await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {
-      DOCSEARCH_ENABLED: 'true'
+      DOCSEARCH_ENABLED: 'true',
     })
     global.window = {}
     global.window.antoraLunr = {}

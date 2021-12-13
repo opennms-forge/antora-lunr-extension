@@ -32,7 +32,7 @@ function mockContentCatalog (seed = [], pages = []) {
     getComponents: () => Object.values(components),
     getComponentVersion: (component, version) =>
       (typeof component === 'string' ? components[component] : component).versions.find((it) => it.version === version),
-    getPages: () => pages
+    getPages: () => pages,
   }
 }
 

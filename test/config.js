@@ -6,7 +6,7 @@ const config = {
   },
   require: __filename,
   spec: resolveSpec(),
-  timeout: 10 * 60 * 1000
+  timeout: 10 * 60 * 1000,
 }
 
 if (process.env.npm_config_watch) config.watch = true
@@ -14,7 +14,7 @@ if (process.env.CI) {
   Object.assign(config, {
     forbidOnly: true,
     reporter: 'xunit',
-    'reporter-option': ['output=test-report/tests-xunit.xml']
+    'reporter-option': ['output=test-report/tests-xunit.xml'],
   })
 }
 
