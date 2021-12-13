@@ -1,0 +1,9 @@
+= Changelog
+:url-repo: https://gitlab.com/antora/antora-lunr-extension
+
+This document provides a summary of all notable changes to this project grouped by release.
+For a detailed view of what's changed, refer to the {url-repo}/commits[commit history] of this project.
+
+== Unreleased
+
+* Initial rerelease of Antora Lunr integration as an Antora extension
