@@ -10,6 +10,11 @@
     "url": "https://gitlab.com/antora/antora-lunr-extension/-/issues"
   },
   "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./generate-index": "./lib/generate-index.js",
+    "./package.json": "./package.json"
+  },
   "engines": {
     "node": ">=16.0.0"
   },
