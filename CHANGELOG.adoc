@@ -6,4 +6,11 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 
 == Unreleased
 
+=== Added
+
 * Initial rerelease of Antora Lunr integration as an Antora extension
+
+=== Changed
+
+* Move lib/extension.js to lib/index.js (#6)
+* Configure package exports to both limit what files can be required and to define a require API (#6)
