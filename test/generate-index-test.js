@@ -10,6 +10,14 @@ const lunr = require('lunr')
 describe('generateIndex()', () => {
   const emptyConfig = {}
 
+  it('should expose generateIndex as an exported function of main script', () => {
+    expect(require('@antora/lunr-extension').generateIndex).to.equal(generateIndex)
+  })
+
+  it('should expose generateIndex as an exported function via require path', () => {
+    expect(require('@antora/lunr-extension/generate-index')).to.equal(generateIndex)
+  })
+
   it('should generate an empty index when there are no pages', () => {
     const playbook = {
       site: {

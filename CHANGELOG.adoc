@@ -9,6 +9,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 === Added
 
 * Initial rerelease of Antora Lunr integration as an Antora extension
+* Expose `generateIndex` as exported function of main script and require path `@antora/lunr-extension/generate-index` (#9)
 
 === Changed
 
