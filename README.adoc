@@ -1,0 +1,190 @@
+= Antora Lunr Extension
+:url-antora-docs: https://docs.antora.org/antora/3.0
+:url-antora-lunr: https://github.com/Mogztter/antora-lunr
+
+https://lunrjs.com[Lunr] provides a great search experience without the need for external, server-side, search services.
+With this extension, you can add an _offline_ search engine to your Antora documentation site.
+
+NOTE: The Antora Lunr Extension is designed for and compatible with {url-antora-docs}/whats-new/[Antora 3.0 and newer].
+To integrate Lunr with an earlier version of Antora, you must use {url-antora-lunr}[antora-lunr] instead.
+
+To add Lunr search to your Antora documentation site, you need to install the extension package, register the extension in your Antora playbook file, and add the search interface to the pages of your site.
+Let's get started.
+
+== Install
+
+Begin by installing the extension package into your playbook project:
+
+[,console]
+----
+$ npm install https://gitlab.com/antora/antora-lunr-extension
+----
+
+TIP: While we recommend using local dependencies rather than global, you _can_ install the extension globally if you add the `-g` flag.
+
+[,console]
+----
+$ npm install -g https://gitlab.com/antora/antora-lunr-extension
+----
+
+== Usage
+
+=== Register the extension
+
+Now that you have the Lunr extension installed, you need to {url-antora-docs}/extend/register-extension/[register the extension] with Antora.
+To register the extension, add an entry to the `antora.extensions` key in your {url-antora-docs}/playbook/[Antora playbook file] (e.g., _antora-playbook.yml_).
+
+Open the Antora playbook file and add the extension as follows:
+
+.antora-playbook.yml
+[,yaml]
+----
+antora:
+  extensions:
+  - require: '@antora/lunr-extension'
+----
+
+Alternately, you can register the extension directly from the `antora` CLI using the `--extension` option.
+
+=== Generate an index file
+
+When you generate your documentation site the next time, the extension will automatically generate an index file at the root of your output directory.
+The location of this file depends on the value of `output.dir` key in your playbook.
+When you the {url-antora-docs}/playbook/configure-output/#default-output-dir[default output dir], that location is _build/site/search-index.js_.
+
+=== Enable the search interface
+
+Now that we have a search index (i.e., _search-index.js_), we need to enable the search component in the UI.
+
+Copy the _supplemental_ui_ directory from the npm package at _node_modules/@antora/lunr-extension/supplemental_ui_ in your Antora playbook repository and configure the `ui.supplemental_files` key as follows:
+
+.antora-playbook.yml
+[,yaml]
+----
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+  supplemental_files: ./supplemental_ui
+----
+
+NOTE: For this to function correctly you must provide the `site.url` key in your playbook file.
+See the Antora docs on the {url-antora-docs}/playbook/configure-ui/[playbook UI keys].
+If using the site locally (not serving from a web server), then you can set your `site.url` key to a file URI (e.g., `file:///home/documents/antora/website/public/`).
+
+TIP: If you're using the https://www.npmjs.com/package/http-server[http-server] to provide an HTTP server to view your site locally, set the `site.url` key to `+http://localhost:8080+`.
+
+=== Generate the site
+
+Generate your documentation site using Antora.
+For instance, via the command line:
+
+[,console]
+----
+$ antora antora-playbook.yml
+----
+
+== Configuration
+
+NOTE: In {url-antora-lunr}[antora-lunr] (the predecessor of this extension), configuration was performed using environment variables.
+In this extension, configuration is now done using configuration keys in the playbook.
+
+=== Index only the latest version
+
+To index only the latest (i.e., released) version, set the `index_latest_only` configuration key:
+
+.antora-playbook.yml
+[,yaml]
+----
+antora:
+  extensions:
+  - require: '@antora/lunr-extension'
+    index_latest_only: true
+----
+
+By default the extension indexes all the versions of your documentation components.
+
+=== Support for other languages
+
+By default, Lunr only supports English as an indexing language.
+You can add support for the following other languages:
+
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/IQ.png[ar] Arabic (ar)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/CN.png[zh] Chinese (zh)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/DK.png[da] Danish (da)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/NL.png[nl] Dutch (nl)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/FI.png[fi] Finnish (fi)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/FR.png[fr] French (fr)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/DE.png[de] German (de)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/IN.png[hi] Hindi (hi)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/HU.png[hu] Hungarian (hu)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/IT.png[it] Italian (it)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/JP.png[ja] Japanese (ja)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/NO.png[no] Norwegian (no)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/PT.png[pt] Portuguese (pt)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/RO.png[ro] Romanian (ro)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/RU.png[ru] Russian (ru)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/ES.png[es] Spanish (es)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/SE.png[sv] Swedish (sv)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/TH.png[th] Thai (th)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/TR.png[tr] Turkish (tr)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/VN.png[vi] Vietnamese (vi)
+
+IMPORTANT: To use Chinese as your language, you need to install the `nodejieba` dependency:
+
+[,console]
+----
+$ npm install nodejieba
+----
+
+To use one or more languages, set the `languages` configuration key with all the desired language codes as a list:
+
+.antora-playbook.yml
+[,yaml]
+----
+antora:
+  extensions:
+  - require: '@antora/lunr-extension'
+    languages: [en, fr]
+----
+
+== Run tests
+
+This project is built using Node.js.
+In order to run the tests, you need Node.js and the development dependencies for the project.
+
+First, make sure you have at least Node.js installed.
+
+[,console]
+----
+$ node -v
+----
+
+If you don't have Node.js, you can use https://github.com/nvm-sh/nvm[nvm] to install and manage it.
+
+Once you have Node.js installed, run the following command to install the development dependencies:
+
+[,console]
+----
+$ npm i
+----
+
+Now that you have the necessary prerequisites, you can run the tests using the following command:
+
+[,console]
+----
+$ npm test
+----
+
+This command will use Mocha to run all the tests in the _tests/_ folder.
+
+== Who's using it?
+
+Here's a list of projects using the Antora Lunr extension.
+
+* https://documentation.suse.com/external-tree/en-us/suma/4.0/suse-manager/[SUSE Manager Documentation]
+* https://www.uyuni-project.org/uyuni-docs/[Uyuni Documentation]
+* https://source.whitehatsec.com/help/sentinel/[NTT Application Security]
+* https://hub.syn.tools/hub/[Commodore Components Hub (VSHN)]
+
+To add your project to this list, please https://gitlab.com/antora/antora-lunr-extension/-/edit/main/README.adoc[edit this file]!
