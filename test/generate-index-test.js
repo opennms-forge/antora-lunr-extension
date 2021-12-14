@@ -52,28 +52,13 @@ describe('generateIndex()', () => {
     expect(installPage.text).to.equal('foo')
     expect(installPage.component).to.equal('component-a')
     expect(installPage.version).to.equal('2.0')
-    expect(
-      index.index.search('foo'),
-      'foo is present in contents'
-    ).to.have.lengthOf(1)
+    expect(index.index.search('foo'), 'foo is present in contents').to.have.lengthOf(1)
     expect(index.index.search('2.0'), '2.0 is not indexed').to.be.empty()
     expect(index.index.search('bar'), 'bar is not present').to.be.empty()
-    expect(
-      index.index.search('install-foo'),
-      'install-foo is present in url'
-    ).to.have.lengthOf(1)
-    expect(
-      index.index.search('component-a'),
-      'component-a is present in component'
-    ).to.have.lengthOf(1)
-    expect(
-      index.index.search('*foo*'),
-      '*foo* is present in contents'
-    ).to.have.lengthOf(1)
-    expect(
-      index.index.search('foo*'),
-      'foo* is present in contents'
-    ).to.have.lengthOf(1)
+    expect(index.index.search('install-foo'), 'install-foo is present in url').to.have.lengthOf(1)
+    expect(index.index.search('component-a'), 'component-a is present in component').to.have.lengthOf(1)
+    expect(index.index.search('*foo*'), '*foo* is present in contents').to.have.lengthOf(1)
+    expect(index.index.search('foo*'), 'foo* is present in contents').to.have.lengthOf(1)
   })
 
   it('should use provided logger to log info message that search index is being built with languages', () => {
@@ -194,12 +179,20 @@ describe('generateIndex()', () => {
     ])
     const index = generateIndex(playbook, contentCatalog)
     const installPage = index.store['/hello/1.0/']
-    expect(installPage.text).to.equal('The Static Site Generator for Tech Writers This site hosts the technical documentation for Antora With Antora, you manage docs as code')
+    expect(installPage.text).to.equal(
+      'The Static Site Generator for Tech Writers This site hosts the technical documentation for Antora With Antora, you manage docs as code'
+    )
     expect(installPage.component).to.equal('hello')
     expect(installPage.version).to.equal('1.0')
     expect(installPage.title).to.equal('Antora Documentation')
-    expect(index.index.search('asciidoctor'), '"Asciidoctor" is a navigation title and should not be indexed').to.have.lengthOf(0)
-    expect(index.index.search('help'), '"How Antora Can Help" is a navigation item and should not be indexed').to.have.lengthOf(0)
+    expect(
+      index.index.search('asciidoctor'),
+      '"Asciidoctor" is a navigation title and should not be indexed'
+    ).to.have.lengthOf(0)
+    expect(
+      index.index.search('help'),
+      '"How Antora Can Help" is a navigation item and should not be indexed'
+    ).to.have.lengthOf(0)
   })
 
   it('should not index pagination', () => {
@@ -222,9 +215,7 @@ describe('generateIndex()', () => {
     ])
     const index = generateIndex(playbook, contentCatalog)
     const installPage = index.store['/hello/1.0/']
-    expect(installPage.text).to.equal(
-      'The Static Site Generator for Tech Writers'
-    )
+    expect(installPage.text).to.equal('The Static Site Generator for Tech Writers')
   })
 
   it('should only index the first document title (heading 1)', () => {
@@ -527,9 +518,7 @@ describe('generateIndex()', () => {
         },
       ])
       const index = generateIndex(playbook, contentCatalog)
-      expect(index.store['/component-a/2.0/install-foo'].url).to.equal(
-        '/component-a/2.0/install-foo'
-      )
+      expect(index.store['/component-a/2.0/install-foo'].url).to.equal('/component-a/2.0/install-foo')
     })
 
     it('should use relative links when site URL is a relative path', () => {
@@ -544,8 +533,7 @@ describe('generateIndex()', () => {
             relative: 'install-foo.adoc',
           },
         },
-      ]
-      )
+      ])
       const index = generateIndex(playbook, contentCatalog)
       expect(index.store['/component-a/2.0/install-foo'].url).to.equal('/component-a/2.0/install-foo')
     })
@@ -614,14 +602,26 @@ describe('generateIndex()', () => {
       // https://github.com/MihaiValentin/lunr-languages/issues/68
       // french
       expect(idx.search('empêche').length, '"empêche" should match because the verb "empêcher" is present').to.equal(1)
-      expect(idx.search('nouveaute').length, '"nouveaute" should match because the word `nouveautés` is present').to.equal(1)
+      expect(
+        idx.search('nouveaute').length,
+        '"nouveaute" should match because the word `nouveautés` is present'
+      ).to.equal(1)
       // make sure that missing words are not found
       expect(idx.search('feature').length, '"feature" should not match because the word is absent').to.equal(0)
-      expect(idx.search('fonctionnalité').length, '"fonctionnalité" should not match because the word is absent').to.equal(0)
+      expect(
+        idx.search('fonctionnalité').length,
+        '"fonctionnalité" should not match because the word is absent'
+      ).to.equal(0)
       // german (not enabled)
       expect(idx.search('heiße').length, '"heiße" should match because the word `heiße` is present').to.equal(1)
-      expect(idx.search('heisse').length, '"heisse" should not match because the word `heisse` is absent and the German stemmer is not enabled').to.equal(0)
-      expect(idx.search('gemuse').length, '"gemuse" should not match because the word `gemuse` is absent and the German stemmer is not enabled').to.equal(0)
+      expect(
+        idx.search('heisse').length,
+        '"heisse" should not match because the word `heisse` is absent and the German stemmer is not enabled'
+      ).to.equal(0)
+      expect(
+        idx.search('gemuse').length,
+        '"gemuse" should not match because the word `gemuse` is absent and the German stemmer is not enabled'
+      ).to.equal(0)
     })
 
     it('should apply multiple stemmers and stopwords when DOCSEARCH_LANGS = "fr,de"', () => {
@@ -641,14 +641,26 @@ describe('generateIndex()', () => {
       const idx = lunr.Index.load(index.index.toJSON())
       // french
       expect(idx.search('empêche').length, '"empêche" should match because the verb "empêcher" is present').to.equal(1)
-      expect(idx.search('nouveaute').length, '"nouveaute" should match because the word `nouveautés` is present').to.equal(1)
+      expect(
+        idx.search('nouveaute').length,
+        '"nouveaute" should match because the word `nouveautés` is present'
+      ).to.equal(1)
       // make sure that missing words are not found
       expect(idx.search('feature').length, '"feature" should not match because the word is absent').to.equal(0)
-      expect(idx.search('fonctionnalité').length, '"fonctionnalité" should not match because the word is absent').to.equal(0)
+      expect(
+        idx.search('fonctionnalité').length,
+        '"fonctionnalité" should not match because the word is absent'
+      ).to.equal(0)
       // german
       expect(idx.search('heiße').length, '"heiße" should match because the word `heiße` is present').to.equal(1)
-      expect(idx.search('heisse').length, '"heisse" should match because the word `heiße` is present and the German stemmer is enabled').to.equal(1)
-      expect(idx.search('gemuse').length, '"gemuse" should match because the word `Gemüse` is present and the German stemmer is enabled').to.equal(1)
+      expect(
+        idx.search('heisse').length,
+        '"heisse" should match because the word `heiße` is present and the German stemmer is enabled'
+      ).to.equal(1)
+      expect(
+        idx.search('gemuse').length,
+        '"gemuse" should match because the word `Gemüse` is present and the German stemmer is enabled'
+      ).to.equal(1)
     })
 
     it('should apply the default (English) stemmer and stopword when DOCSEARCH_LANGS is empty (en)', () => {
@@ -665,8 +677,14 @@ describe('generateIndex()', () => {
       const index = generateIndex(playbook, contentCatalog)
 
       const idx = lunr.Index.load(index.index.toJSON())
-      expect(idx.search('empeche').length, '"empeche" should not match any document because "empêchaient" should be indexed as "empêchaient"').to.equal(0)
-      expect(idx.search('nouveaute').length, '"nouveaute" should not match any document because "nouveautés" should be indexed as "nouveautés"').to.equal(0)
+      expect(
+        idx.search('empeche').length,
+        '"empeche" should not match any document because "empêchaient" should be indexed as "empêchaient"'
+      ).to.equal(0)
+      expect(
+        idx.search('nouveaute').length,
+        '"nouveaute" should not match any document because "nouveautés" should be indexed as "nouveautés"'
+      ).to.equal(0)
       expect(idx.search('empêchaient').length).to.equal(1)
       expect(idx.search('nouveautés').length).to.equal(1)
     })

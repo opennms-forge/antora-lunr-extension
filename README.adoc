@@ -178,6 +178,17 @@ $ npm test
 
 This command will use Mocha to run all the tests in the _tests/_ folder.
 
+Before submitting any merge request, please run the following scripts to ensure the code is properly formatted:
+
+[,console]
+----
+$ npm run lint
+  npm run format
+----
+
+If either of these scripts fail, the build will fail.
+However, you need not worry about running them until you are ready to submit your change.
+
 == Who's using it?
 
 Here's a list of projects using the Antora Lunr extension.

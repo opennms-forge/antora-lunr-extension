@@ -25,6 +25,11 @@ lint:
   stage: test
   script:
     - npm run lint
+    - |
+      if [ -n "$(npm --silent run format && git --no-pager diff --name-only)" ]; then
+        git --no-pager diff
+        false
+      fi
 
 test:
   extends: .npm

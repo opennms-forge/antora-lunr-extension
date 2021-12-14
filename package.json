@@ -20,6 +20,7 @@
   },
   "scripts": {
     "coverage": "nyc _mocha",
+    "format": "node npm/format.js lib,test,npm",
     "lint": "eslint \"{lib,test,npm}/**/*.js\"",
     "test": "_mocha"
   },
@@ -46,7 +47,8 @@
     "eslint": "~7.32",
     "eslint-config-standard": "~16.0",
     "mocha": "~9.1",
-    "nyc": "~15.1"
+    "nyc": "~15.1",
+    "prettier-eslint": "~13.0"
   },
   "nyc": {
     "cache": true,
