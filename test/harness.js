@@ -7,7 +7,8 @@ const chai = require('chai')
 const dirtyChai = require('dirty-chai')
 chai.use(dirtyChai)
 const { configureLogger } = require('@antora/logger')
+const buildContentCatalog = require('./build-content-catalog')
 
 beforeEach(() => configureLogger({ level: 'silent' }))
 
-module.exports = { expect: chai.expect }
+module.exports = { buildContentCatalog, expect: chai.expect }

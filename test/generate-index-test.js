@@ -1,14 +1,25 @@
 /* eslint-env mocha */
 'use strict'
 
-const { expect } = require('./harness')
-const generateIndex = require('../lib/generate-index')
-const mockContentCatalog = require('./mock-content-catalog.js')
-
+const { buildContentCatalog, expect } = require('./harness')
 const lunr = require('lunr')
+
+const generateIndex = require('../lib/generate-index')
 
 describe('generateIndex()', () => {
   const emptyConfig = {}
+  let playbook
+
+  beforeEach(() => {
+    playbook = {
+      site: {
+        url: 'https://docs.example.org',
+      },
+      urls: {
+        htmlExtensionStyle: 'indexify',
+      },
+    }
+  })
 
   it('should expose generateIndex as an exported function of main script', () => {
     expect(require('@antora/lunr-extension').generateIndex).to.equal(generateIndex)
@@ -19,41 +30,26 @@ describe('generateIndex()', () => {
   })
 
   it('should generate an empty index when there are no pages', () => {
-    const playbook = {
-      site: {
-        url: 'https://antora.org',
-      },
-    }
     // no page, no index!
-    const contentCatalog = mockContentCatalog()
+    const contentCatalog = buildContentCatalog(playbook)
     const index = generateIndex(playbook, contentCatalog, emptyConfig)
     expect(index).to.be.empty()
   })
 
   it('should generate an index', () => {
-    const playbook = {
-      site: {
-        url: 'https://antora.org/docs/',
-      },
-    }
-    const contentCatalog = mockContentCatalog([],
-      [
-        {
-          contents: Buffer.from('<article class="doc"><p>foo</p></article>'),
-          src: {
-            component: 'component-a',
-            version: '2.0',
-            stem: 'install-foo',
-          },
-          asciidoc: {},
-          pub: {
-            url: '/component-a/install-foo',
-          },
+    playbook.urls.htmlExtensionStyle = 'drop'
+    const contentCatalog = buildContentCatalog(playbook, [
+      {
+        contents: Buffer.from('<article class="doc"><p>foo</p></article>'),
+        src: {
+          component: 'component-a',
+          version: '2.0',
+          relative: 'install-foo.adoc',
         },
-      ]
-    )
+      },
+    ])
     const index = generateIndex(playbook, contentCatalog, emptyConfig)
-    const installPage = index.store['/component-a/install-foo']
+    const installPage = index.store['/component-a/2.0/install-foo']
     expect(installPage.text).to.equal('foo')
     expect(installPage.component).to.equal('component-a')
     expect(installPage.version).to.equal('2.0')
@@ -82,12 +78,8 @@ describe('generateIndex()', () => {
   })
 
   it('should generate a document for each titles', () => {
-    const playbook = {
-      site: {
-        url: 'https://docs.antora.org',
-      },
-    }
-    const contentCatalog = mockContentCatalog([], [
+    playbook.urls = { htmlExtensionStyle: 'indexify' }
+    const contentCatalog = buildContentCatalog(playbook, [
       {
         contents: Buffer.from(`
           <article class="doc">
@@ -104,16 +96,11 @@ describe('generateIndex()', () => {
         src: {
           component: 'hello',
           version: '1.0',
-          stem: '',
-        },
-        asciidoc: {},
-        pub: {
-          url: '/antora/1.0/',
         },
       },
     ])
     const index = generateIndex(playbook, contentCatalog, emptyConfig)
-    const installPage = index.store['/antora/1.0/']
+    const installPage = index.store['/hello/1.0/']
     expect(installPage.text).to.equal(
       'The Static Site Generator for Tech Writers This site hosts the technical documentation for Antora With Antora, you manage docs as code'
     )
@@ -129,12 +116,8 @@ describe('generateIndex()', () => {
   })
 
   it('should not index navigation titles', () => {
-    const playbook = {
-      site: {
-        url: 'https://docs.antora.org',
-      },
-    }
-    const contentCatalog = mockContentCatalog([], [
+    playbook.urls = { htmlExtensionStyle: 'indexify' }
+    const contentCatalog = buildContentCatalog(playbook, [
       {
         contents: Buffer.from(`
 <aside class="navigation">
@@ -160,16 +143,11 @@ describe('generateIndex()', () => {
         src: {
           component: 'hello',
           version: '1.0',
-          stem: '',
-        },
-        asciidoc: {},
-        pub: {
-          url: '/antora/1.0/',
         },
       },
     ])
     const index = generateIndex(playbook, contentCatalog, emptyConfig)
-    const installPage = index.store['/antora/1.0/']
+    const installPage = index.store['/hello/1.0/']
     expect(installPage.text).to.equal('The Static Site Generator for Tech Writers This site hosts the technical documentation for Antora With Antora, you manage docs as code')
     expect(installPage.component).to.equal('hello')
     expect(installPage.version).to.equal('1.0')
@@ -179,12 +157,8 @@ describe('generateIndex()', () => {
   })
 
   it('should not index pagination', () => {
-    const playbook = {
-      site: {
-        url: 'https://docs.antora.org',
-      },
-    }
-    const contentCatalog = mockContentCatalog([], [
+    playbook.urls = { htmlExtensionStyle: 'indexify' }
+    const contentCatalog = buildContentCatalog(playbook, [
       {
         contents: Buffer.from(`
           <article class="doc">
@@ -197,28 +171,19 @@ describe('generateIndex()', () => {
         src: {
           component: 'hello',
           version: '1.0',
-          stem: '',
-        },
-        asciidoc: {},
-        pub: {
-          url: '/antora/1.0/',
         },
       },
     ])
     const index = generateIndex(playbook, contentCatalog, emptyConfig)
-    const installPage = index.store['/antora/1.0/']
+    const installPage = index.store['/hello/1.0/']
     expect(installPage.text).to.equal(
       'The Static Site Generator for Tech Writers'
     )
   })
 
   it('should only index the first document title (heading 1)', () => {
-    const playbook = {
-      site: {
-        url: 'https://docs.antora.org',
-      },
-    }
-    const contentCatalog = mockContentCatalog([], [
+    delete playbook.urls.htmlExtensionStyle
+    const contentCatalog = buildContentCatalog(playbook, [
       {
         contents: Buffer.from(`
           <article class="doc">
@@ -245,26 +210,18 @@ describe('generateIndex()', () => {
         src: {
           component: 'hello',
           version: '1.0',
-          stem: '',
-        },
-        asciidoc: {},
-        pub: {
-          url: '/antora/1.0/whats-new.html',
+          relative: 'whats-new.adoc',
         },
       },
     ])
     const index = generateIndex(playbook, contentCatalog, emptyConfig)
-    const whatsNewPage = index.store['/antora/1.0/whats-new.html']
+    const whatsNewPage = index.store['/hello/1.0/whats-new.html']
     expect(whatsNewPage.title).to.equal('What’s New in Antora')
   })
 
   it('should exclude pages with noindex defined as metadata', () => {
-    const playbook = {
-      site: {
-        url: 'https://docs.antora.org',
-      },
-    }
-    const contentCatalog = mockContentCatalog([], [
+    playbook.urls = { htmlExtensionStyle: 'indexify' }
+    const contentCatalog = buildContentCatalog(playbook, [
       {
         contents: Buffer.from(`
           <html lang="en">
@@ -319,11 +276,6 @@ describe('generateIndex()', () => {
         src: {
           component: 'hello',
           version: '1.0',
-          stem: '',
-        },
-        asciidoc: {},
-        pub: {
-          url: '/antora/1.0/',
         },
       },
       {
@@ -372,30 +324,22 @@ describe('generateIndex()', () => {
         src: {
           component: 'hello',
           version: '1.0',
-          stem: '',
-        },
-        asciidoc: {},
-        pub: {
-          url: '/antora/1.0/features/',
+          relative: 'features.adoc',
         },
       },
     ])
     const index = generateIndex(playbook, contentCatalog, emptyConfig)
-    const privatePage = index.store['/antora/1.0/']
+    const privatePage = index.store['/hello/1.0/']
     expect(privatePage).to.be.undefined()
-    const featuresPage = index.store['/antora/1.0/features/']
+    const featuresPage = index.store['/hello/1.0/features/']
     expect(featuresPage.text).to.equal(
       'Automate the assembly of your secure, nimble static site as changes happen instead of wrestling with a CMS giant. Rebuild and deploy your site automatically in a matter of seconds in response to any change. Never have to worry about patching security holes in your deployed CMS application since you don’t have one. All pages are static—​in the JAMstack style. Need to migrate your site to a different domain? Just rebuild the site and relaunch it on the new host. Adapt your site to fit seamlessly with your other web properties. No site is an island. Sites must play nice with others to maintain a consistent brand and user experiences. Static sites generated by Antora are well-suited for this role. With page templates and a little help from an automated process, you can blend your documentation pages into existing sites, giving the impression it’s all part of a single uniform site.'
     )
   })
 
   it('should exclude pages with noindex defined as attribute', () => {
-    const playbook = {
-      site: {
-        url: 'https://docs.antora.org',
-      },
-    }
-    const contentCatalog = mockContentCatalog([], [
+    playbook.urls = { htmlExtensionStyle: 'indexify' }
+    const contentCatalog = buildContentCatalog(playbook, [
       {
         contents: Buffer.from(`
 <html lang="en">
@@ -419,15 +363,11 @@ describe('generateIndex()', () => {
         src: {
           component: 'hello',
           version: '1.0',
-          stem: '',
         },
         asciidoc: {
           attributes: {
             noindex: '',
           },
-        },
-        pub: {
-          url: '/antora/1.0/',
         },
       },
       {
@@ -452,47 +392,23 @@ describe('generateIndex()', () => {
         src: {
           component: 'hello',
           version: '1.0',
-          stem: '',
-        },
-        asciidoc: {},
-        pub: {
-          url: '/antora/1.0/features/',
+          relative: 'features.adoc',
         },
       },
     ])
     const index = generateIndex(playbook, contentCatalog, emptyConfig)
-    const privatePage = index.store['/antora/1.0/']
+    const privatePage = index.store['/hello/1.0/']
     expect(privatePage).to.be.undefined()
-    const featuresPage = index.store['/antora/1.0/features/']
+    const featuresPage = index.store['/hello/1.0/features/']
     expect(featuresPage.text).to.equal(
       'Automate the assembly of your secure, nimble static site as changes happen instead of wrestling with a CMS giant.'
     )
   })
 
   it('should only index the latest version when there are multiple versions and DOCSEARCH_INDEX_VERSION=latest', () => {
-    const playbook = {
-      site: {
-        url: 'https://docs.antora.org',
-      },
-    }
-    const contentCatalog = mockContentCatalog(
-      [
-        {
-          component: 'hello',
-          version: '1.0',
-          module: 'module-a',
-          family: 'page',
-        },
-        {
-          component: 'hello',
-          version: '1.5',
-          module: 'module-a',
-          family: 'page',
-        },
-      ],
-      [
-        {
-          contents: Buffer.from(`
+    const contentCatalog = buildContentCatalog(playbook, [
+      {
+        contents: Buffer.from(`
 <html lang="en">
   <body class="article">
     <main role="main">
@@ -512,18 +428,14 @@ describe('generateIndex()', () => {
     </main>
   </body>
 </html>`),
-          src: {
-            component: 'hello',
-            version: '1.0',
-            stem: '',
-          },
-          asciidoc: {},
-          pub: {
-            url: '/antora/1.0/features/',
-          },
+        src: {
+          component: 'hello',
+          version: '1.0',
+          relative: 'features.adoc',
         },
-        {
-          contents: Buffer.from(`
+      },
+      {
+        contents: Buffer.from(`
 <html lang="en">
 <body class="article">
   <main role="main">
@@ -542,18 +454,13 @@ describe('generateIndex()', () => {
   </main>
 </body>
 </html>`),
-          src: {
-            component: 'hello',
-            version: '1.5',
-            stem: '',
-          },
-          asciidoc: {},
-          pub: {
-            url: '/antora/1.5/features/',
-          },
+        src: {
+          component: 'hello',
+          version: '1.5',
+          relative: 'features.adoc',
         },
-      ]
-    )
+      },
+    ])
     const config = { indexLatestOnly: true }
     const index = generateIndex(playbook, contentCatalog, config)
     expect(index.index.search('spinnacle').length).to.equal(1)
@@ -561,71 +468,57 @@ describe('generateIndex()', () => {
 
   describe('Paths', () => {
     it('should use relative links when site URL is not defined', () => {
-      const playbook = {
-        site: {}, // site.url is undefined
-      }
-      const contentCatalog = mockContentCatalog([], [
+      delete playbook.site.url
+      playbook.urls.htmlExtensionStyle = 'drop'
+      const contentCatalog = buildContentCatalog(playbook, [
         {
           contents: Buffer.from('foo'),
           src: {
             component: 'component-a',
             version: '2.0',
-            stem: 'install-foo',
-          },
-          pub: {
-            url: '/component-a/install-foo',
+            relative: 'install-foo.adoc',
           },
         },
       ])
       const index = generateIndex(playbook, contentCatalog, emptyConfig)
-      expect(index.store['/component-a/install-foo'].url).to.equal(
-        '/component-a/install-foo'
+      expect(index.store['/component-a/2.0/install-foo'].url).to.equal(
+        '/component-a/2.0/install-foo'
       )
     })
+
     it('should use relative links when site URL is a relative path', () => {
-      const playbook = {
-        site: {
-          url: '/docs',
-        },
-      }
-      const contentCatalog = mockContentCatalog([], [
+      playbook.site.url = '/docs'
+      playbook.urls.htmlExtensionStyle = 'drop'
+      const contentCatalog = buildContentCatalog(playbook, [
         {
           contents: Buffer.from('foo'),
           src: {
             component: 'component-a',
             version: '2.0',
-            stem: 'install-foo',
-          },
-          pub: {
-            url: '/component-a/install-foo',
+            relative: 'install-foo.adoc',
           },
         },
       ]
       )
       const index = generateIndex(playbook, contentCatalog, emptyConfig)
-      expect(index.store['/component-a/install-foo'].url).to.equal('/component-a/install-foo')
+      expect(index.store['/component-a/2.0/install-foo'].url).to.equal('/component-a/2.0/install-foo')
     })
+
     it('should use relative links when site URL is an absolute local path (using file:// protocol)', () => {
-      const playbook = {
-        site: {
-          url: 'file:///path/to/docs',
-        },
-      }
-      const contentCatalog = mockContentCatalog([], [
+      playbook.site.url = 'file:///path/to/docs'
+      playbook.urls.htmlExtensionStyle = 'drop'
+      const contentCatalog = buildContentCatalog(playbook, [
         {
           contents: Buffer.from('foo'),
           src: {
             component: 'component-a',
             version: '2.0',
-            stem: 'install-foo',
-          },
-          pub: {
-            url: '/component-a/install-foo',
+            relative: 'install-foo.adoc',
           },
         },
       ])
       const index = generateIndex(playbook, contentCatalog, emptyConfig)
-      expect(index.store['/component-a/install-foo'].url).to.equal('/component-a/install-foo')
+      expect(index.store['/component-a/2.0/install-foo'].url).to.equal('/component-a/2.0/install-foo')
     })
   })
 
@@ -655,22 +548,13 @@ describe('generateIndex()', () => {
       </article>`
 
     it('should apply the French stemmer and stopword when DOCSEARCH_LANGS = `fr`', () => {
-      const playbook = {
-        site: {
-          url: 'https://docs.antora.org',
-        },
-      }
-      const contentCatalog = mockContentCatalog([], [
+      const contentCatalog = buildContentCatalog(playbook, [
         {
           contents: Buffer.from(frenchArticleWithGermanQuoteContent),
           src: {
             component: 'hello',
             version: '1.0',
-            stem: '',
-          },
-          asciidoc: {},
-          pub: {
-            url: '/antora/1.0/whats-new.html',
+            relative: 'whats-new.adoc',
           },
         },
       ])
@@ -695,22 +579,13 @@ describe('generateIndex()', () => {
     })
 
     it('should apply multiple stemmers and stopwords when DOCSEARCH_LANGS = "fr,de"', () => {
-      const playbook = {
-        site: {
-          url: 'https://docs.antora.org',
-        },
-      }
-      const contentCatalog = mockContentCatalog([], [
+      const contentCatalog = buildContentCatalog(playbook, [
         {
           contents: Buffer.from(frenchArticleWithGermanQuoteContent),
           src: {
             component: 'hello',
             version: '1.0',
-            stem: '',
-          },
-          asciidoc: {},
-          pub: {
-            url: '/antora/1.0/whats-new.html',
+            relative: 'whats-new.adoc',
           },
         },
       ])
@@ -731,22 +606,13 @@ describe('generateIndex()', () => {
     })
 
     it('should apply the default (English) stemmer and stopword when DOCSEARCH_LANGS is empty (en)', () => {
-      const playbook = {
-        site: {
-          url: 'https://docs.antora.org',
-        },
-      }
-      const contentCatalog = mockContentCatalog([], [
+      const contentCatalog = buildContentCatalog(playbook, [
         {
           contents: Buffer.from(frenchArticleWithGermanQuoteContent),
           src: {
             component: 'hello',
             version: '1.0',
-            stem: '',
-          },
-          asciidoc: {},
-          pub: {
-            url: '/antora/1.0/whats-new.html',
+            relative: 'whats-new.adoc',
           },
         },
       ])
