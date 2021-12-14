@@ -16,5 +16,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 * Move lib/extension.js to lib/index.js (#6)
 * Configure package exports to both limit what files can be required and to define a require API (#6)
 * Use generator context bound to register function of extension instead of function argument
+* Pass logger as keyword argument named `logger` to `generateIndex` function (#10)
+* Make keyword arguments on `generateIndex` function optional (#10)
 * Convert README from Markdown to AsciiDoc
 * Change license from MIT to MPL-2.0

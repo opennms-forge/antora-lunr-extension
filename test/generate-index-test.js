@@ -1,13 +1,12 @@
 /* eslint-env mocha */
 'use strict'
 
-const { buildContentCatalog, expect } = require('./harness')
+const { buildContentCatalog, configureLogger, expect } = require('./harness')
 const lunr = require('lunr')
 
 const generateIndex = require('../lib/generate-index')
 
 describe('generateIndex()', () => {
-  const emptyConfig = {}
   let playbook
 
   beforeEach(() => {
@@ -32,7 +31,7 @@ describe('generateIndex()', () => {
   it('should generate an empty index when there are no pages', () => {
     // no page, no index!
     const contentCatalog = buildContentCatalog(playbook)
-    const index = generateIndex(playbook, contentCatalog, emptyConfig)
+    const index = generateIndex(playbook, contentCatalog)
     expect(index).to.be.empty()
   })
 
@@ -48,7 +47,7 @@ describe('generateIndex()', () => {
         },
       },
     ])
-    const index = generateIndex(playbook, contentCatalog, emptyConfig)
+    const index = generateIndex(playbook, contentCatalog)
     const installPage = index.store['/component-a/2.0/install-foo']
     expect(installPage.text).to.equal('foo')
     expect(installPage.component).to.equal('component-a')
@@ -77,6 +76,53 @@ describe('generateIndex()', () => {
     ).to.have.lengthOf(1)
   })
 
+  it('should use provided logger to log info message that search index is being built with languages', () => {
+    const contentCatalog = buildContentCatalog(playbook, [
+      {
+        contents: Buffer.from('<article class="doc"><p>foo</p></article>'),
+        src: {
+          component: 'component-a',
+          version: '2.0',
+          relative: 'install-foo.adoc',
+        },
+      },
+    ])
+    const messages = []
+    const logger = configureLogger({ level: 'info', destination: { write: (message) => messages.push(message) } }).get()
+    generateIndex(playbook, contentCatalog, { logger })
+    expect(messages).to.not.be.empty()
+    expect(JSON.parse(messages[0])).to.include({
+      level: 'info',
+      msg: 'Building search index with the language(s): en',
+    })
+  })
+
+  it('should use console if logger not provided to log message that search index is being built with languages', () => {
+    const contentCatalog = buildContentCatalog(playbook, [
+      {
+        contents: Buffer.from('<article class="doc"><p>foo</p></article>'),
+        src: {
+          component: 'component-a',
+          version: '2.0',
+          relative: 'install-foo.adoc',
+        },
+      },
+    ])
+    const messages = []
+    const write = process.stdout.write
+    const nodeEnv = process.env.NODE_ENV
+    try {
+      delete process.env.NODE_ENV
+      process.stdout.write = (message) => messages.push(message)
+      generateIndex(playbook, contentCatalog)
+      expect(messages).to.not.be.empty()
+      expect(messages[0]).to.equal('Building search index with the language(s): en\n')
+    } finally {
+      if (nodeEnv) process.env.NODE_ENV = nodeEnv
+      process.stdout.write = write
+    }
+  })
+
   it('should generate a document for each titles', () => {
     playbook.urls = { htmlExtensionStyle: 'indexify' }
     const contentCatalog = buildContentCatalog(playbook, [
@@ -99,7 +145,7 @@ describe('generateIndex()', () => {
         },
       },
     ])
-    const index = generateIndex(playbook, contentCatalog, emptyConfig)
+    const index = generateIndex(playbook, contentCatalog)
     const installPage = index.store['/hello/1.0/']
     expect(installPage.text).to.equal(
       'The Static Site Generator for Tech Writers This site hosts the technical documentation for Antora With Antora, you manage docs as code'
@@ -146,7 +192,7 @@ describe('generateIndex()', () => {
         },
       },
     ])
-    const index = generateIndex(playbook, contentCatalog, emptyConfig)
+    const index = generateIndex(playbook, contentCatalog)
     const installPage = index.store['/hello/1.0/']
     expect(installPage.text).to.equal('The Static Site Generator for Tech Writers This site hosts the technical documentation for Antora With Antora, you manage docs as code')
     expect(installPage.component).to.equal('hello')
@@ -174,7 +220,7 @@ describe('generateIndex()', () => {
         },
       },
     ])
-    const index = generateIndex(playbook, contentCatalog, emptyConfig)
+    const index = generateIndex(playbook, contentCatalog)
     const installPage = index.store['/hello/1.0/']
     expect(installPage.text).to.equal(
       'The Static Site Generator for Tech Writers'
@@ -214,7 +260,7 @@ describe('generateIndex()', () => {
         },
       },
     ])
-    const index = generateIndex(playbook, contentCatalog, emptyConfig)
+    const index = generateIndex(playbook, contentCatalog)
     const whatsNewPage = index.store['/hello/1.0/whats-new.html']
     expect(whatsNewPage.title).to.equal('What’s New in Antora')
   })
@@ -328,7 +374,7 @@ describe('generateIndex()', () => {
         },
       },
     ])
-    const index = generateIndex(playbook, contentCatalog, emptyConfig)
+    const index = generateIndex(playbook, contentCatalog)
     const privatePage = index.store['/hello/1.0/']
     expect(privatePage).to.be.undefined()
     const featuresPage = index.store['/hello/1.0/features/']
@@ -396,7 +442,7 @@ describe('generateIndex()', () => {
         },
       },
     ])
-    const index = generateIndex(playbook, contentCatalog, emptyConfig)
+    const index = generateIndex(playbook, contentCatalog)
     const privatePage = index.store['/hello/1.0/']
     expect(privatePage).to.be.undefined()
     const featuresPage = index.store['/hello/1.0/features/']
@@ -480,7 +526,7 @@ describe('generateIndex()', () => {
           },
         },
       ])
-      const index = generateIndex(playbook, contentCatalog, emptyConfig)
+      const index = generateIndex(playbook, contentCatalog)
       expect(index.store['/component-a/2.0/install-foo'].url).to.equal(
         '/component-a/2.0/install-foo'
       )
@@ -500,7 +546,7 @@ describe('generateIndex()', () => {
         },
       ]
       )
-      const index = generateIndex(playbook, contentCatalog, emptyConfig)
+      const index = generateIndex(playbook, contentCatalog)
       expect(index.store['/component-a/2.0/install-foo'].url).to.equal('/component-a/2.0/install-foo')
     })
 
@@ -517,7 +563,7 @@ describe('generateIndex()', () => {
           },
         },
       ])
-      const index = generateIndex(playbook, contentCatalog, emptyConfig)
+      const index = generateIndex(playbook, contentCatalog)
       expect(index.store['/component-a/2.0/install-foo'].url).to.equal('/component-a/2.0/install-foo')
     })
   })
@@ -547,7 +593,7 @@ describe('generateIndex()', () => {
         </div>
       </article>`
 
-    it('should apply the French stemmer and stopword when DOCSEARCH_LANGS = `fr`', () => {
+    it('should apply the French stemmer and stopword when DOCSEARCH_LANGS = "fr"', () => {
       const contentCatalog = buildContentCatalog(playbook, [
         {
           contents: Buffer.from(frenchArticleWithGermanQuoteContent),
@@ -616,7 +662,7 @@ describe('generateIndex()', () => {
           },
         },
       ])
-      const index = generateIndex(playbook, contentCatalog, emptyConfig)
+      const index = generateIndex(playbook, contentCatalog)
 
       const idx = lunr.Index.load(index.index.toJSON())
       expect(idx.search('empeche').length, '"empeche" should not match any document because "empêchaient" should be indexed as "empêchaient"').to.equal(0)
