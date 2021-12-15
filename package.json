@@ -37,12 +37,13 @@
   "dependencies": {
     "cheerio": "1.0.0-rc.10",
     "html-entities": "~2.3",
-    "lunr": "2.3.8",
+    "lunr": "~2.3",
     "lunr-languages": "~1.9"
   },
   "devDependencies": {
     "@antora/site-generator": "3.0.0-rc.2",
     "chai": "~4.3",
+    "chai-fs": "~2.0",
     "dirty-chai": "~2.0",
     "eslint": "~7.32",
     "eslint-config-standard": "~16.0",

@@ -4,8 +4,8 @@
 process.env.NODE_ENV = 'test'
 
 const chai = require('chai')
-const dirtyChai = require('dirty-chai')
-chai.use(dirtyChai)
+chai.use(require('chai-fs'))
+chai.use(require('dirty-chai'))
 const { configureLogger } = require(require.resolve('@antora/logger', {
   paths: [require.resolve('@antora/site-generator')],
 }))

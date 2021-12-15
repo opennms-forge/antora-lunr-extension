@@ -12,15 +12,16 @@ const WORK_DIR = ospath.join(__dirname, 'work')
 const generateSite = require('@antora/site-generator')
 
 describe('generateSite()', () => {
-  beforeEach(() => fsp.rm(WORK_DIR, { recursive: true, force: true }))
-  afterEach(() => fsp.rm(WORK_DIR, { recursive: true, force: true }))
+  const cacheDir = ospath.join(WORK_DIR, '.cache/antora')
+  const outputDir = ospath.join(WORK_DIR, 'public')
+  const playbookFile = ospath.join(FIXTURES_DIR, 'docs-site/antora-playbook.yml')
+
+  beforeEach(() => fsp.rm(outputDir, { recursive: true, force: true }))
+  after(() => fsp.rm(WORK_DIR, { recursive: true, force: true }))
 
   it('should generate a site with a search index', async () => {
     const playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook.yml')
-    const outputDir = ospath.join(WORK_DIR, 'public')
     const cacheDir = ospath.join(WORK_DIR, '.cache', 'antora')
-    // NOTE: While all configuration is passed along with the pipeline configuration, see playbook,
-    //       the supplemental_ui and its' search field are dependant on the environment variables
     await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {
       DOCSEARCH_ENABLED: 'true',
     })
@@ -35,5 +36,13 @@ describe('generateSite()', () => {
     const startPageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr', 'index.html'))
     const $ = cheerio.load(startPageContents)
     expect($('#search-input')).to.have.lengthOf(1)
+  })
+
+  it('should output lunr.js client/engine to js vendor directory of UI output folder', async () => {
+    await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {
+      DOCSEARCH_ENABLED: 'true',
+    })
+    const expected = ospath.join(outputDir, '_/js/vendor/lunr.js')
+    expect(expected).to.be.a.file().and.equal(require.resolve('lunr/lunr.min.js'))
   })
 })

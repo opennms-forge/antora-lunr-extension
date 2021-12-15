@@ -14,6 +14,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 === Changed
 
 * Move lib/extension.js to lib/index.js (#6)
+* Don't vendor lunr.js script in repository; grab it from require path (#11)
 * Configure package exports to both limit what files can be required and to define a require API (#6)
 * Use generator context bound to register function of extension instead of function argument
 * Pass logger as keyword argument named `logger` to `generateIndex` function (#10)
