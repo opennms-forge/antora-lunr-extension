@@ -14,18 +14,18 @@ if (process.env.CI) {
   Object.assign(config, {
     forbidOnly: true,
     reporter: 'xunit',
-    'reporter-option': ['output=test-report/tests-xunit.xml'],
+    'reporter-option': ['output=reports/tests-xunit.xml'],
   })
 }
 
 function logCoverageReportPath () {
   if (!process.env.NYC_PROCESS_ID) return
   const { CI_PROJECT_PATH, CI_JOB_ID } = process.env
-  const coverageReportRelpath = 'coverage-report/index.html'
-  const coverageReportPath = CI_JOB_ID
+  const coverageReportRelpath = 'reports/lcov-report/index.html'
+  const coverageReportURL = CI_JOB_ID
     ? `https://gitlab.com/${CI_PROJECT_PATH}/-/jobs/${CI_JOB_ID}/artifacts/file/${coverageReportRelpath}`
     : require('url').pathToFileURL(coverageReportRelpath)
-  console.log(`Coverage report: ${coverageReportPath}`)
+  console.log(`Coverage report: ${coverageReportURL}`)
 }
 
 function resolveSpec () {
