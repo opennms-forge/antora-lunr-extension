@@ -31,11 +31,12 @@ test:
   stage: test
   script:
     - npm run coverage
-  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  coverage: '/^All files *[|] *([0-9.]+) *[|]/'
   artifacts:
     when: always
+    name: coverage-report
     paths:
-      - coverage-report/lcov-report
+      - coverage-report
     reports:
       cobertura: coverage-report/cobertura-coverage.xml
       junit: test-report/tests-xunit.xml

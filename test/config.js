@@ -21,7 +21,7 @@ if (process.env.CI) {
 function logCoverageReportPath () {
   if (!process.env.NYC_PROCESS_ID) return
   const { CI_PROJECT_PATH, CI_JOB_ID } = process.env
-  const coverageReportRelpath = 'coverage-report/lcov-report/index.html'
+  const coverageReportRelpath = 'coverage-report/index.html'
   const coverageReportPath = CI_JOB_ID
     ? `https://gitlab.com/${CI_PROJECT_PATH}/-/jobs/${CI_JOB_ID}/artifacts/file/${coverageReportRelpath}`
     : require('url').pathToFileURL(coverageReportRelpath)

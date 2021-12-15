@@ -56,7 +56,8 @@
     ],
     "reporter": [
       "cobertura",
-      "lcov"
+      "html",
+      "text"
     ],
     "reportDir": "coverage-report"
   },
