@@ -1,8 +1,8 @@
 /* eslint-env browser */
 window.antoraLunr = (function (lunr) {
+  /* eslint-disable no-var */
   const scriptAttrs = document.getElementById('search-script').dataset
   const basePath = scriptAttrs.basePath
-  const pagePath = scriptAttrs.pagePath
   var searchInput = document.getElementById('search-input')
   var searchResult = document.createElement('div')
   searchResult.classList.add('search-result-dropdown-menu')
@@ -93,7 +93,7 @@ window.antoraLunr = (function (lunr) {
     return hits
   }
 
-  function createSearchResult(result, store, searchResultDataset) {
+  function createSearchResult (result, store, searchResultDataset) {
     result.forEach(function (item) {
       var url = item.ref
       var hash
@@ -195,17 +195,14 @@ window.antoraLunr = (function (lunr) {
   }
 
   function init (data) {
-    var index = Object.assign({index: lunr.Index.load(data.index), store: data.store})
+    var index = Object.assign({ index: lunr.Index.load(data.index), store: data.store })
     var search = debounce(function () {
       searchIndex(index.index, index.store, searchInput.value)
     }, 100)
     searchInput.addEventListener('keydown', search)
 
-    searchInput.addEventListener('keydown', function(event) {
-      const key = event.key;
-      if (key === 'Escape') {
-        searchInput.value = ''
-      }
+    searchInput.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') searchInput.value = ''
     })
 
     // this is prevented in case of mousedown attached to SearchResultItem
@@ -216,7 +213,5 @@ window.antoraLunr = (function (lunr) {
     })
   }
 
-  return {
-    init: init,
-  }
+  return { init: init }
 })(window.lunr)

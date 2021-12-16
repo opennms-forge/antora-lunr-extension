@@ -20,8 +20,8 @@
   },
   "scripts": {
     "coverage": "nyc _mocha",
-    "format": "node npm/format.js lib,test,npm",
-    "lint": "eslint \"{lib,test,npm}/**/*.js\"",
+    "format": "node npm/format.js lib,test,npm,supplemental_ui",
+    "lint": "eslint \"{lib,test,npm}/**/*.js\" supplemental_ui/js/vendor/search.js",
     "test": "_mocha"
   },
   "files": [
