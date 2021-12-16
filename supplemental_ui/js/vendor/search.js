@@ -196,8 +196,13 @@ window.antoraLunr = (function (lunr) {
 
   function init (data) {
     var index = Object.assign({ index: lunr.Index.load(data.index), store: data.store })
+    var debug = 'URLSearchParams' in window && new URLSearchParams(window.location.search).has('lunr-debug')
     var search = debounce(function () {
-      searchIndex(index.index, index.store, searchInput.value)
+      try {
+        searchIndex(index.index, index.store, searchInput.value)
+      } catch (err) {
+        if (debug) console.debug('Invalid search query: ' + searchInput.value + ' (' + err.message + ')')
+      }
     }, 100)
     searchInput.addEventListener('keydown', search)
 

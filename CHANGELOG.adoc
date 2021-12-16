@@ -21,3 +21,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 * Make keyword arguments on `generateIndex` function optional (#10)
 * Convert README from Markdown to AsciiDoc
 * Change license from MIT to MPL-2.0
+
+=== Fixed
+
+* Catch invalid query and only log message at debug level if lunr-debug=1 query string parameter is set (#13)
