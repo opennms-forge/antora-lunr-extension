@@ -182,8 +182,7 @@ Before submitting any merge request, please run the following scripts to ensure 
 
 [,console]
 ----
-$ npm run lint
-  npm run format
+$ npm run lint && npm run format
 ----
 
 If either of these scripts fail, the build will fail.
