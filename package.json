@@ -4,6 +4,13 @@
   "description": "Generate a Lunr index from a catalog.",
   "license": "MPL-2.0",
   "author": "Guillaume Grossetie <g.grossetie@gmail.com>",
+  "contributors": [
+    "Dan Allen <dan@opendevise.com>",
+    "Thor K. Høgås <thor@roht.no>",
+    "Daniel Mulholland",
+    "Gautier de Saint Martin Lacaze",
+    "Alexander Schwartz"
+  ],
   "homepage": "https://antora.org",
   "repository": "https://gitlab.com/antora/antora-lunr-extension",
   "bugs": {
