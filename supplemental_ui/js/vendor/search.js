@@ -3,10 +3,15 @@ window.antoraLunr = (function (lunr) {
   /* eslint-disable no-var */
   const config = document.getElementById('search-script').dataset
   const basePath = config.basePath || ''
+  appendStylesheet(config.stylesheet)
   var searchInput = document.getElementById('search-input')
   var searchResult = document.createElement('div')
   searchResult.classList.add('search-result-dropdown-menu')
   searchInput.parentNode.appendChild(searchResult)
+
+  function appendStylesheet (href) {
+    document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'stylesheet', href: href }))
+  }
 
   function highlightText (doc, position) {
     var hits = []
