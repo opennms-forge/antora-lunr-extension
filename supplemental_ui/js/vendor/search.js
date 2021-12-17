@@ -115,8 +115,7 @@ window.antoraLunr = (function (lunr) {
     var documentHit = document.createElement('div')
     documentHit.classList.add('search-result-document-hit')
     var documentHitLink = document.createElement('a')
-    var rootPath = basePath
-    documentHitLink.href = rootPath + item.ref
+    documentHitLink.href = basePath + item.ref
     documentHit.appendChild(documentHitLink)
     hits.forEach(function (hit) {
       documentHitLink.appendChild(hit)
