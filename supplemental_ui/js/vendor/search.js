@@ -1,8 +1,8 @@
 /* eslint-env browser */
 window.antoraLunr = (function (lunr) {
   /* eslint-disable no-var */
-  const scriptAttrs = document.getElementById('search-script').dataset
-  const basePath = scriptAttrs.basePath
+  const config = document.getElementById('search-script').dataset
+  const basePath = config.basePath || ''
   var searchInput = document.getElementById('search-input')
   var searchResult = document.createElement('div')
   searchResult.classList.add('search-result-dropdown-menu')
