@@ -11,11 +11,12 @@ workflow:
 variables:
   GIT_DEPTH: '5'
   LINUX_DISTRO: bullseye
+  NODE_VERSION: '16'
   NPM_CONFIG_CACHE: &npm_cache_dir .cache/npm
 default:
+  image: node:$NODE_VERSION-$LINUX_DISTRO
   interruptible: true
 .npm:
-  image: node:16-$LINUX_DISTRO
   stage: test
   before_script:
   - node -p '`${os.type()} ${os.release()}\nNode.js ${process.version}`'
@@ -55,3 +56,10 @@ test:node-16-linux:
 test:node-17-linux:
   extends: .npm
   image: node:17-$LINUX_DISTRO
+release:
+  stage: deploy
+  environment: releases
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "web" && $CI_PROJECT_PATH == "antora/antora-lunr-extension" && $CI_COMMIT_BRANCH && $RELEASE_VERSION
+  script:
+  - npm/release.sh
