@@ -18,7 +18,7 @@ function formatAll (dirs, cwd = process.cwd()) {
         const jsfiles = []
         for (const dirent of dirents) {
           const name = dirent.name
-          dirent.isDirectory() ? subdirs.push(name) : name.endsWith('.js') && name !== 'lunr.js' && jsfiles.push(name)
+          dirent.isDirectory() ? subdirs.push(name) : name.endsWith('.js') && jsfiles.push(name)
         }
         const promises = subdirs.length ? [formatAll(subdirs, dir)] : []
         for (const jsfile of jsfiles) {
