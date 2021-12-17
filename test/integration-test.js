@@ -22,7 +22,10 @@ describe('generateSite()', () => {
   it('should generate a site with a search index', async () => {
     await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {
       DOCSEARCH_ENABLED: 'true',
+      DOCSEARCH_ENGINE: 'lunr',
     })
+    const searchIndexPath = ospath.join(outputDir, 'search-index.js')
+    expect(searchIndexPath).to.be.a.file()
     global.window = {
       antoraLunr: {
         init (index) {
@@ -31,16 +34,19 @@ describe('generateSite()', () => {
         },
       },
     }
-    require(ospath.join(outputDir, 'search-index.js'))
+    require(searchIndexPath)
     const startPageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr', 'index.html'))
     const $ = cheerio.load(startPageContents)
+    expect($('link[rel=stylesheet][href$="/search.css"]')).to.have.lengthOf(1)
     expect($('#search-input')).to.have.lengthOf(1)
+    expect($('#search-script')).to.have.lengthOf(1)
     delete global.window
   })
 
   it('should output lunr.js client/engine to js vendor directory of UI output folder', async () => {
     await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {
       DOCSEARCH_ENABLED: 'true',
+      DOCSEARCH_ENGINE: 'lunr',
     })
     const expected = ospath.join(outputDir, '_/js/vendor/lunr.js')
     expect(expected).to.be.a.file().and.equal(require.resolve('lunr/lunr.min.js'))
