@@ -1,7 +1,7 @@
 = Antora Lunr Extension
 :url-antora-docs: https://docs.antora.org/antora/3.0
 :url-antora-lunr: https://github.com/Mogztter/antora-lunr
-:toc:
+:toc: preamble
 ifdef::env-gitlab[]
 :toc-title: Contents
 :toclevels: 1
