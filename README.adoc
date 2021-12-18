@@ -2,10 +2,8 @@
 :url-antora-docs: https://docs.antora.org/antora/3.0
 :url-antora-lunr: https://github.com/Mogztter/antora-lunr
 :toc: preamble
-ifdef::env-gitlab[]
 :toc-title: Contents
-:toclevels: 1
-endif::[]
+ifdef::env-gitlab[:toclevels: 1]
 
 https://lunrjs.com[Lunr] provides a great search experience without the need for external, server-side search services.
 With this extension, you can add _offline_, full-text search powered by Lunr to your Antora documentation site.
@@ -16,28 +14,46 @@ To integrate Lunr with an earlier version of Antora, you must use {url-antora-lu
 To add Lunr search to your Antora documentation site, you need to install the extension package, register the extension in your Antora playbook file, and add the search interface to the pages of your site.
 Let's get started.
 
-== Install
+== Prerequisites
 
-Begin by installing the extension package into your playbook project:
+In order to use this extension, you must be using at least Node.js 16 and Antora 3.
+We also assume you have configured an Antora playbook file (i.e., _antora-playbook.yml_) to build your site.
 
-[,console]
-----
-$ npm install https://gitlab.com/antora/antora-lunr-extension
-----
+== Installation
 
-TIP: While we recommend using local dependencies rather than global, you _can_ install the extension globally if you add the `-g` flag.
+Begin by installing the extension package into your {url-antora-docs}/playbook/use-an-existing-playbook-project/[playbook project]:
 
 [,console]
 ----
-$ npm install -g https://gitlab.com/antora/antora-lunr-extension
+$ npm i @antora/lunr-extension
 ----
+
+You also have the option of installing the extension globally by adding the `-g` flag to the `npm i` command:
+
+[,console]
+----
+$ npm i -g @antora/lunr-extension
+----
+
+However, we strongly recommend installing dependencies into the playbook project.
+This strategy makes it easier to manage dependencies, documents those dependencies clearly, and keeps the dependencies of the current site isolated from others.
+
+The previous two commands will download and install the latest release of this software from the npm registry.
+If you want to use the development version, you can replace the name of the package with the URL of the git repository.
+
+[,console]
+----
+$ npm i https://gitlab.com/antora/antora-lunr-extension
+----
+
+Although the software in the git repository is regularly and rigorously tested, the behavior of the development version may not always match the documentation.
 
 == Usage
 
 === Register the extension
 
 Now that you have the Lunr extension installed, you need to {url-antora-docs}/extend/register-extension/[register the extension] with Antora.
-To register the extension, add an entry to the `antora.extensions` key in your {url-antora-docs}/playbook/[Antora playbook file] (e.g., _antora-playbook.yml_).
+To register the extension, add an entry to the `antora.extensions` key in your {url-antora-docs}/playbook/[Antora playbook file].
 
 Open the Antora playbook file and add the extension as follows:
 
@@ -49,7 +65,7 @@ antora:
   - require: '@antora/lunr-extension'
 ----
 
-Alternately, you can register the extension directly from the `antora` CLI using the `--extension` option.
+TIP: Alternately, you can register the extension when you run the `antora` command by using the `--extension` option.
 
 === Generate an index file
 
@@ -84,13 +100,22 @@ TIP: If you're using the https://www.npmjs.com/package/http-server[http-server] 
 
 === Generate the site
 
-Generate your documentation site using Antora.
-For instance, via the command line:
+If you have registered the extension in your playbook file, then you can generate your site using the `antora` command without having to pass any additional options or environment variables.
 
 [,console]
 ----
 $ antora antora-playbook.yml
 ----
+
+If you have not registered the extension in your playbook file, you can register it using the `--extension` CLI option of the `antora` command:
+
+[,console]
+----
+$ antora --extension @antora/lunr-extension antora-playbook.yml
+----
+
+Using the `--extension` option also allows you to enable the extension that's registered in the playbook file, but marked as not enabled using the `enabled` key.
+See {url-antora-docs}/extend/enable-extension/[Enable an Extension] for details about how that works.
 
 == Configuration
 
@@ -118,7 +143,7 @@ By default, Lunr only supports English as an indexing language.
 You can add support for the following other languages:
 
 * image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/IQ.png[ar] Arabic (ar)
-* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/CN.png[zh] Chinese (zh)
+* image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/CN.png[zh] Chinese (zh) (see note below)
 * image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/DK.png[da] Danish (da)
 * image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/NL.png[nl] Dutch (nl)
 * image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/FI.png[fi] Finnish (fi)
@@ -138,12 +163,7 @@ You can add support for the following other languages:
 * image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/TR.png[tr] Turkish (tr)
 * image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/VN.png[vi] Vietnamese (vi)
 
-IMPORTANT: To use Chinese as your language, you need to install the `nodejieba` dependency:
-
-[,console]
-----
-$ npm install nodejieba
-----
+NOTE: To use Chinese as your language, you must install the `nodejieba` dependency (i.e., `npm i nodejieba`).
 
 To use one or more languages, set the `languages` configuration key with all the desired language codes as a list:
 
