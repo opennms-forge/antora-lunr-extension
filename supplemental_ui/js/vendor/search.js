@@ -25,7 +25,7 @@ window.antoraLunr = (function (lunr) {
 
     var end = start + length
     var textEnd = text.length - 1
-    var contextOffset = 15
+    var contextOffset = 100
     var contextAfter = end + contextOffset > textEnd ? textEnd : end + contextOffset
     var contextBefore = start - contextOffset < 0 ? 0 : start - contextOffset
     if (start === 0 && end === textEnd) {

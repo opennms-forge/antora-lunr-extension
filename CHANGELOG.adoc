@@ -21,6 +21,8 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 * Make keyword arguments on `generateIndex` function optional (#10)
 * Automatically manage env var to activate elements in UI; make `DOCSEARCH_ENABLED` and `DOCSEARCH_ENGINE` env vars obsolete (#12)
 * Move the responsibility of inserting the search stylesheet to the search script; drop the head-meta.hbs template from the supplemental UI (#12)
+* Only style the highlighted term in bold
+* Increase the maximum snippet length from 15 to 100
 * Convert README from Markdown to AsciiDoc
 * Change license from MIT to MPL-2.0
 
