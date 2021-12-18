@@ -521,7 +521,38 @@ describe('generateIndex()', () => {
       expect(index.store['/component-a/2.0/install-foo'].url).to.equal('/component-a/2.0/install-foo')
     })
 
-    it('should use relative links when site URL is a relative path', () => {
+    it('should use relative links when site URL is a URL without a subpath', () => {
+      const contentCatalog = buildContentCatalog(playbook, [
+        {
+          contents: Buffer.from('foo'),
+          src: {
+            component: 'component-a',
+            version: '2.0',
+            relative: 'install-foo.adoc',
+          },
+        },
+      ])
+      const index = generateIndex(playbook, contentCatalog)
+      expect(index.store['/component-a/2.0/install-foo/'].url).to.equal('/component-a/2.0/install-foo/')
+    })
+
+    it('should use relative links when site URL is a URL with a subpath', () => {
+      playbook.site.url += '/docs'
+      const contentCatalog = buildContentCatalog(playbook, [
+        {
+          contents: Buffer.from('foo'),
+          src: {
+            component: 'component-a',
+            version: '2.0',
+            relative: 'install-foo.adoc',
+          },
+        },
+      ])
+      const index = generateIndex(playbook, contentCatalog)
+      expect(index.store['/component-a/2.0/install-foo/'].url).to.equal('/component-a/2.0/install-foo/')
+    })
+
+    it('should use relative links when site URL is a root-relative path', () => {
       playbook.site.url = '/docs'
       playbook.urls.htmlExtensionStyle = 'drop'
       const contentCatalog = buildContentCatalog(playbook, [
@@ -538,7 +569,7 @@ describe('generateIndex()', () => {
       expect(index.store['/component-a/2.0/install-foo'].url).to.equal('/component-a/2.0/install-foo')
     })
 
-    it('should use relative links when site URL is an absolute local path (using file:// protocol)', () => {
+    it('should use relative links when site URL is a file URI', () => {
       playbook.site.url = 'file:///path/to/docs'
       playbook.urls.htmlExtensionStyle = 'drop'
       const contentCatalog = buildContentCatalog(playbook, [
