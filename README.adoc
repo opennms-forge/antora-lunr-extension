@@ -7,10 +7,10 @@ ifdef::env-gitlab[]
 :toclevels: 1
 endif::[]
 
-https://lunrjs.com[Lunr] provides a great search experience without the need for external, server-side, search services.
+https://lunrjs.com[Lunr] provides a great search experience without the need for external, server-side search services.
 With this extension, you can add _offline_, full-text search powered by Lunr to your Antora documentation site.
 
-NOTE: The Antora Lunr Extension is designed for and compatible with {url-antora-docs}/whats-new/[Antora 3.0 and newer].
+NOTE: The Antora Lunr Extension is designed for and is compatible with {url-antora-docs}/whats-new/[Antora 3.0 and newer].
 To integrate Lunr with an earlier version of Antora, you must use {url-antora-lunr}[antora-lunr] instead.
 
 To add Lunr search to your Antora documentation site, you need to install the extension package, register the extension in your Antora playbook file, and add the search interface to the pages of your site.
@@ -55,7 +55,7 @@ Alternately, you can register the extension directly from the `antora` CLI using
 
 When you generate your documentation site the next time, the extension will automatically generate an index file at the root of your output directory.
 The location of this file depends on the value of `output.dir` key in your playbook.
-When you the {url-antora-docs}/playbook/configure-output/#default-output-dir[default output dir], that location is _build/site/search-index.js_.
+When using the {url-antora-docs}/playbook/configure-output/#default-output-dir[default output dir], that location is _build/site/search-index.js_.
 
 === Enable the search interface
 
