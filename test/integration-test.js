@@ -25,22 +25,22 @@ describe('generateSite()', () => {
     expect(env).to.not.have.property('SITE_SEARCH_PROVIDER')
     const searchIndexPath = ospath.join(outputDir, 'search-index.js')
     expect(searchIndexPath).to.be.a.file()
-    global.window = {
-      antoraLunr: {
-        init (index) {
-          expect(index.store['/antora-lunr/index.html']).to.include({
-            title: 'Antora x Lunr',
-            url: '/antora-lunr/index.html',
-          })
-          expect(index.store['/antora-lunr/named-module/the-page.html']).to.include({
-            title: 'The Page',
-            url: '/antora-lunr/named-module/the-page.html',
-          })
-        },
+    global.lunr = {}
+    global.lunrSiteSearch = {
+      init (lunr, index) {
+        expect(index.store['/antora-lunr/index.html']).to.include({
+          title: 'Antora x Lunr',
+          url: '/antora-lunr/index.html',
+        })
+        expect(index.store['/antora-lunr/named-module/the-page.html']).to.include({
+          title: 'The Page',
+          url: '/antora-lunr/named-module/the-page.html',
+        })
       },
     }
     require(searchIndexPath)
-    delete global.window
+    delete global.lunr
+    delete global.lunrSiteSearch
   })
 
   it('should insert script element with predefined data attributes', async () => {

@@ -1,5 +1,4 @@
-/* eslint-env browser */
-window.antoraLunr = (function (lunr) {
+;(globalThis || window).lunrSiteSearch = (function () {
   /* eslint-disable no-var */
   const config = document.getElementById('search-script').dataset
   const basePath = config.basePath || ''
@@ -198,7 +197,7 @@ window.antoraLunr = (function (lunr) {
     }
   }
 
-  function init (data) {
+  function init (lunr, data) {
     var index = Object.assign({ index: lunr.Index.load(data.index), store: data.store })
     var debug = 'URLSearchParams' in window && new URLSearchParams(window.location.search).has('lunr-debug')
     var search = debounce(function () {
@@ -223,4 +222,4 @@ window.antoraLunr = (function (lunr) {
   }
 
   return { init: init }
-})(window.lunr)
+})()
