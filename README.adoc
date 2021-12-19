@@ -217,6 +217,75 @@ antora:
     languages: [en, fr]
 ----
 
+== UI assumptions
+
+This section is intended for anyone designing and creating a custom UI.
+This extension relies on a contract with the UI in order to minimize the configuration the user must perform to get the extension working.
+Antora's default UI fulfills this contract.
+For custom UIs, the assumptions of this contract are documented here.
+
+=== Environment variable
+
+When this extension is enabled, it sets the `SITE_SEARCH_PROVIDER` environment variable to the value `lunr`.
+This variable is available to the UI templates as `env.SITE_SEARCH_PROVIDER`.
+The existence of this variable informs the UI template which search integration is active (in this case, Lunr).
+When this variable is set, the UI is expected to add certain elements to support the extension.
+
+NOTE: If the UI you're using does not fulfill this contract, you'll need to use the supplemental UI to complete the contract.
+
+=== Search input
+
+This extension assumes that the UI will add an input field for search somewhere in the page.
+_Currently, the provided styles assume it's located in the navbar._
+The template snippet should look something like this:
+
+[,hbs]
+----
+{{#if env.SITE_SEARCH_PROVIDER}}
+<input id="search-input" type="text" placeholder="Search the docs">
+{{/if}}
+----
+
+The UI may enclose the input in other elements in order to position it properly.
+In Antora's default UI, it looks like this:
+
+[,hbs]
+----
+{{#if env.SITE_SEARCH_PROVIDER}}
+<div class="navbar-item search hide-for-print">
+  <div id="search-field" class="field">
+    <input id="search-input" type="text" placeholder="Search the docs"{{#if page.home}} autofocus{{/if}}>
+  </div>
+</div>
+{{/if}}
+----
+
+The only requirement is that the input be of type `text` and have the ID `search-input`.
+
+=== Search scripts
+
+This extension assumes that the UI will include the _search-scripts_ partial somewhere in the footer.
+This partial loads the lunr script, search UI script, and search index into the page.
+The template snippet that includes this partial should look something like this:
+
+[,hbs]
+----
+{{#if env.SITE_SEARCH_PROVIDER}}
+{{> search-scripts}}
+{{/if}}
+----
+
+The supplemental UI from this package provides this partial (_supplemental_ui/partials/search-scripts.hbs_).
+In the future, the partial may be added to the UI catalog automatically by this extension.
+
+=== Search styles
+
+The supplemental UI from this package provides additional CSS to style the search results (_supplemental_ui/css/search.css_).
+This stylesheet is loaded by the search UI script also included in the supplemental UI from this package.
+In the future, the stylesheet may be added to the UI catalog automatically by this extension.
+
+If a custom UI depends on additional styles, the creator of the UI can either bundle those styles or ask the user to place an alternate stylesheet in the supplemental UI.
+
 == Run tests
 
 This project is built using Node.js.
