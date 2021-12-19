@@ -152,6 +152,32 @@ antora:
 
 By default the extension indexes all the versions of your documentation components.
 
+=== Exclude pages
+
+You can instruct the indexer to exclude certain pages by defining the `noindex` document attribute in the AsciiDoc header:
+
+[,asciidoc]
+----
+= Do Not Index Me
+:noindex:
+
+This content will not show up in the search results.
+----
+
+You can exclude the pages for an entire component version by defining the `noindex` AsciiDoc attribute in the component descriptor for that version:
+
+*antora.yml*
+
+[,yaml]
+----
+asciidoc:
+  attributes:
+    noindex: '@'
+----
+
+The indexer will also look for the `robots` meta tag in HTML document and exclude the page if the value of the content attribute is `noindex`.
+That allows you to exclude pages that were either not created from AsciiDoc or that contain a meta robots tag that was added by the UI template based on another condition.
+
 === Support for other languages
 
 By default, Lunr only supports English as an indexing language.
