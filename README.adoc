@@ -77,7 +77,7 @@ When using the {url-antora-docs}/playbook/configure-output/#default-output-dir[d
 
 Now that we have a search index (i.e., _search-index.js_), we need to enable the search component in the UI.
 
-Copy the _supplemental_ui_ directory from the npm package at _node_modules/@antora/lunr-extension/supplemental_ui_ in your Antora playbook repository and configure the `ui.supplemental_files` key as follows:
+Copy the _supplemental_ui_ directory from the npm package at _node_modules/@antora/lunr-extension/supplemental_ui_ in your Antora playbook repository and configure the `ui.supplemental_files` key to point to that location:
 
 .antora-playbook.yml
 [,yaml]
@@ -89,14 +89,29 @@ ui:
   supplemental_files: ./supplemental_ui
 ----
 
-The `site.url` key does not have to be set in your playbook file in order for the search to work.
-You can use the search even when viewing the site offline through a file URI.
-In fact, you can set the site URL in the playbook to any allowable value and the search will work regardless.
-(See the {url-antora-docs}/playbook/site-url/#url-key[site.url key] docs for details).
-This works because the URLs in the search results are computed _relative to the current page_.
-So they work regardless of where the site is deployed or on what page the search is used.
+If you're not already using a supplemental UI, you can point directly to the _supplemental_ui_ directory in the npm package to avoid having to copy (and maintain) it.
+
+.antora-playbook.yml
+[,yaml]
+----
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+  supplemental_files: ./node_modules/@antora/lunr-extension/supplemental_ui
+----
+
+=== Set (or don't set) the site URL
+
+You can set the site URL in the playbook to any allowable value and the search will work regardless.
+(See the docs for the {url-antora-docs}/playbook/site-url/#url-key[site.url key] for details).
+In fact, the `site.url` key doesn't even have to be set.
 
 TIP: If you're using the https://www.npmjs.com/package/http-server[http-server] module to provide an HTTP server to view your site locally, you can set the `site.url` key to `+http://localhost:8080+` to emulate the conditions of a production environment.
+
+The search works independent of the site URL because the URLs in the search results are computed _relative to the current page_.
+That means the browser will resolve them regardless of where the site is deployed or on what page the search is used.
+You can even use the search when viewing the site offline through a file URI.
 
 === Generate the site
 
