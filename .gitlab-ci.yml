@@ -1,13 +1,11 @@
 workflow:
   rules:
-  # Never run on docs branches (i.e., branches whose name begins with docs/)
-  - if: >-
-      ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^docs\//) ||
-      ($CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH =~ /^docs\//)
-    when: never
   # Only run on branches and MRs while preventing duplicate pipelines (i.e., does not run on fork if there's an open MR)
   # See https://docs.gitlab.com/ee/ci/yaml/workflow.html#switch-between-branch-pipelines-and-merge-request-pipelines
-  - if: ($CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS == null) || $CI_PIPELINE_SOURCE == "merge_request_event"
+  # Only run on docs branches that are linked to an MR (i.e., branches whose name begins with docs/)
+  - if: >-
+      $CI_PIPELINE_SOURCE == 'merge_request_event' ||
+      ($CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS == null && $CI_COMMIT_BRANCH !~ /^docs\//)
 variables:
   GIT_DEPTH: '5'
   LINUX_DISTRO: bullseye
@@ -18,6 +16,11 @@ default:
   interruptible: true
 .npm:
   stage: test
+  rules:
+  # NOTE skip tests on docs branches
+  - if: &docs_rule $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^docs\//
+    when: never
+  - when: always
   before_script:
   - node -p '`${os.type()} ${os.release()}\nNode.js ${process.version}`'
   - npm ci --no-fund --prefer-offline --quiet
@@ -40,6 +43,12 @@ lint:
       git --no-pager diff
       false
     fi
+docs:
+  stage: test
+  rules:
+  - if: *docs_rule
+  # NOTE signals success to the MR UI
+  script: echo 'we love docs!'
 test:node-16-linux:
   extends: .npm
   script:
@@ -60,6 +69,6 @@ release:
   stage: deploy
   environment: releases
   rules:
-  - if: $CI_PIPELINE_SOURCE == "web" && $CI_PROJECT_PATH == "antora/antora-lunr-extension" && $CI_COMMIT_BRANCH && $RELEASE_VERSION
+  - if: $CI_PIPELINE_SOURCE == 'web' && $CI_PROJECT_PATH == 'antora/antora-lunr-extension' && $CI_COMMIT_BRANCH && $RELEASE_VERSION
   script:
   - npm/release.sh
