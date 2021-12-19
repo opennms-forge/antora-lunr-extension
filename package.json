@@ -28,7 +28,7 @@
   "scripts": {
     "coverage": "nyc _mocha",
     "format": "node npm/format.js lib,test,npm,supplemental_ui",
-    "lint": "eslint \"{lib,test,npm}/**/*.js\" supplemental_ui/js/vendor/search.js",
+    "lint": "eslint \"{lib,supplemental_ui,test,npm}/**/*.js\"",
     "test": "_mocha",
     "version": "node npm/version.js",
     "prepublishOnly": "node npm/prepublishOnly.js",
