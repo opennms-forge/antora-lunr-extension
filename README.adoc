@@ -3,7 +3,9 @@
 :url-antora-lunr: https://github.com/Mogztter/antora-lunr
 :toc: preamble
 :toc-title: Contents
-ifdef::env-gitlab[:toclevels: 1]
+ifdef::env-gitlab[]
+:toclevels: 1
+endif::[]
 
 https://lunrjs.com[Lunr] provides a great search experience without the need for external, server-side search services.
 With this extension, you can add _offline_, full-text search powered by Lunr to your Antora documentation site.
