@@ -14,6 +14,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 === Changed
 
 * Move lib/extension.js to lib/index.js (#6)
+* Move supplemental_ui/js/vendor/search.js to supplemental_ui/js/search-ui.js
 * Don't vendor lunr.js script in repository; grab it from require path (#11)
 * Configure package exports to both limit what files can be required and to define a require API (#6)
 * Use generator context bound to register function of extension instead of function argument
@@ -21,6 +22,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 * Make keyword arguments on `generateIndex` function optional (#10)
 * Automatically manage env var to activate elements in UI; make `DOCSEARCH_ENABLED` and `DOCSEARCH_ENGINE` env vars obsolete (#12)
 * Move the responsibility of inserting the search stylesheet to the search script; drop the head-meta.hbs template from the supplemental UI (#12)
+* Move the responsibility of including the search scripts to the UI; move footer-scripts.hbs to search-scripts.hbs
 * Only style the highlighted term in bold; style the document title in bold; adjust the font color and spacing in results
 * Increase the maximum snippet length from 15 to 100
 * Convert README from Markdown to AsciiDoc
