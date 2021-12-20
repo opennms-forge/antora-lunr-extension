@@ -22,6 +22,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 * Make keyword arguments on `generateIndex` function optional (#10)
 * Automatically manage env var to activate elements in UI; make `DOCSEARCH_ENABLED` and `DOCSEARCH_ENGINE` env vars obsolete (#12)
 * Move the responsibility of inserting the search stylesheet to the search script; drop the head-meta.hbs template from the supplemental UI (#12)
+* Pass site root path using `data-site-root-path` attribute on script tag instead of `data-base-path`
 * Move the responsibility of including the search scripts to the UI; move footer-scripts.hbs to search-scripts.hbs
 * Only style the highlighted term in bold; style the document title in bold; adjust the font color and spacing in results
 * Increase the maximum snippet length from 15 to 100

@@ -1,7 +1,7 @@
 ;(globalThis || window).lunrSiteSearch = (function () {
   /* eslint-disable no-var */
   const config = document.getElementById('search-script').dataset
-  const basePath = config.basePath || ''
+  const siteRootPath = config.siteRootPath || ''
   appendStylesheet(config.stylesheet)
   var searchInput = document.getElementById('search-input')
   var searchResult = document.createElement('div')
@@ -119,7 +119,7 @@
     var documentHit = document.createElement('div')
     documentHit.classList.add('search-result-document-hit')
     var documentHitLink = document.createElement('a')
-    documentHitLink.href = basePath + item.ref
+    documentHitLink.href = siteRootPath + item.ref
     documentHit.appendChild(documentHitLink)
     hits.forEach(function (hit) {
       documentHitLink.appendChild(hit)
