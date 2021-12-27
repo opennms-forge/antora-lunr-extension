@@ -75,6 +75,9 @@ antora:
   - require: '@antora/lunr-extension'
 ----
 
+NOTE: The `require:` prefix on the `extensions` entry is only necessary if you intend to specify additional configuration keys.
+The prefix is shown here so you don't have to remember to add it later.
+
 TIP: Alternately, you can register the extension when you run the `antora` command by using the `--extension` option.
 
 === Generate an index file
