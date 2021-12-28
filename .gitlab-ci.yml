@@ -11,6 +11,9 @@ variables:
   LINUX_DISTRO: bullseye
   NODE_VERSION: '16'
   NPM_CONFIG_CACHE: &npm_cache_dir .cache/npm
+  RELEASE_VERSION:
+    value: ''
+    description: The version to release from the selected protected branch if the build succeeds. To enable, specify an exact version or increment keyword.
 default:
   image: node:$NODE_VERSION-$LINUX_DISTRO
   interruptible: true
