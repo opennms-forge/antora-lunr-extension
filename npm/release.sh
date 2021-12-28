@@ -63,8 +63,8 @@ tag=$RELEASE_NPM_TAG
   if case $(node -p 'require("./package.json").version') in 1.0.0-*) ;; *) false;; esac; then
     sed -i "s/^tag=$RELEASE_NPM_TAG$/tag=latest/" .npmrc
   fi
-  npm publish
   git push origin $(git describe --tags --exact-match)
+  npm publish
   git push origin $RELEASE_BRANCH
 )
 
