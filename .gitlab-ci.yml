@@ -41,11 +41,7 @@ lint:
     policy: pull-push
   script:
   - npm run lint
-  - |
-    if [ -n "$(npm --silent run format && git --no-pager diff --name-only)" ]; then
-      git --no-pager diff
-      false
-    fi
+  - if [ -n "$(npm --silent run format && git --no-pager diff --name-only)" ]; then git --no-pager diff && false; fi
 docs:
   stage: test
   rules:
