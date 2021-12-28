@@ -10,7 +10,10 @@ variables:
   GIT_DEPTH: '5'
   DEFAULT_NODE_VERSION: '16'
   LINUX_DISTRO: bullseye
+  NPM_CONFIG_AUDIT: 'false'
   NPM_CONFIG_CACHE: &npm_cache_dir .cache/npm
+  NPM_CONFIG_FUND: 'false'
+  NPM_CONFIG_PREFER_OFFLINE: 'true'
   RELEASE_VERSION:
     value: ''
     description: The version to release from the selected protected branch if the build succeeds. To enable, specify an exact version or increment keyword.
@@ -26,7 +29,7 @@ default:
   - when: always
   before_script:
   - node -p '`${os.type()} ${os.release()}\nNode.js ${process.version}`'
-  - npm ci --no-fund --prefer-offline --quiet
+  - npm ci --audit --quiet
   cache: &npm_cache
     key: npm-cache
     paths:
