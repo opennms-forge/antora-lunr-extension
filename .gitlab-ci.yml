@@ -1,16 +1,12 @@
 workflow:
   rules:
-  # Only run on branches and MRs while preventing duplicate pipelines (i.e., does not run on fork if there's an open MR)
+  - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_PIPELINE_SOURCE == 'schedule' || $CI_PIPELINE_SOURCE == 'web'
   # See https://docs.gitlab.com/ee/ci/yaml/workflow.html#switch-between-branch-pipelines-and-merge-request-pipelines
-  # Only run on docs branches that are linked to an MR (i.e., branches whose name begins with docs/)
-  - if: >-
-      $CI_PIPELINE_SOURCE == 'merge_request_event' ||
-      ($CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS == null && $CI_COMMIT_BRANCH !~ /^docs\//)
+  - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS == null && $CI_COMMIT_BRANCH !~ /^docs\//
 variables:
   GIT_DEPTH: '5'
   DEFAULT_NODE_VERSION: '16'
   LINUX_DISTRO: bullseye
-  NPM_CONFIG_AUDIT: 'false'
   NPM_CONFIG_CACHE: &npm_cache_dir .cache/npm
   NPM_CONFIG_FUND: 'false'
   NPM_CONFIG_PREFER_OFFLINE: 'true'
@@ -20,22 +16,31 @@ variables:
 default:
   image: node:$DEFAULT_NODE_VERSION-$LINUX_DISTRO
   interruptible: true
-.npm:
-  stage: test
+.rules:
+- &if_docs_mr
   rules:
-  # NOTE skip tests on docs branches
-  - if: &docs_rule $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^docs\//
+  - if: &docs_mr $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^docs\//
+- &unless_docs_mr
+  rules:
+  - if: *docs_mr
     when: never
   - when: on_success
+- &if_release
+  rules:
+  - if: $CI_PIPELINE_SOURCE == 'web' && $CI_PROJECT_PATH == 'antora/antora-lunr-extension' && $CI_COMMIT_BRANCH && $CI_COMMIT_REF_PROTECTED && $RELEASE_VERSION
+.npm:
+  stage: test
+  <<: *unless_docs_mr
   before_script:
   - node -p '`${os.type()} ${os.release()}\nNode.js ${process.version}`'
-  - npm ci --audit --quiet
+  - npm ci --quiet
   cache: &npm_cache
     key: npm-cache
     paths:
     - *npm_cache_dir
     policy: pull
   script: npm test
+# this job also seeds the dependency cache
 lint:
   extends: .npm
   stage: .pre
@@ -45,11 +50,10 @@ lint:
   script:
   - npm run lint
   - if [ -n "$(npm --silent run format && git --no-pager diff --name-only)" ]; then git --no-pager diff && false; fi
+# this job signals success to the MR UI
 docs:
   stage: test
-  rules:
-  - if: *docs_rule
-  # NOTE signals success to the MR UI
+  <<: *if_docs_mr
   script: echo 'we love docs!'
 test:node-16-linux:
   extends: .npm
@@ -71,7 +75,6 @@ release:
   stage: deploy
   interruptible: false
   environment: releases
-  rules:
-  - if: $CI_PIPELINE_SOURCE == 'web' && $CI_PROJECT_PATH == 'antora/antora-lunr-extension' && $CI_COMMIT_BRANCH && $RELEASE_VERSION
+  <<: *if_release
   script:
   - npm/release.sh
