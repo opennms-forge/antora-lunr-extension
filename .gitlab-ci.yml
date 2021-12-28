@@ -67,6 +67,7 @@ test:node-17-linux:
   image: node:17-$LINUX_DISTRO
 release:
   stage: deploy
+  interruptible: false
   environment: releases
   rules:
   - if: $CI_PIPELINE_SOURCE == 'web' && $CI_PROJECT_PATH == 'antora/antora-lunr-extension' && $CI_COMMIT_BRANCH && $RELEASE_VERSION
