@@ -1,12 +1,19 @@
 #!/bin/bash
 
 PACKAGE_NAME=$(node -p 'require("./package.json").name')
-if [ -z $RELEASE_NPM_TOKEN ]; then
-  declare -n RELEASE_NPM_TOKEN="RELEASE_NPM_TOKEN_$GITLAB_USER_LOGIN"
+if [ -z $RELEASE_DEPLOY_KEY ]; then
+  declare -n RELEASE_DEPLOY_KEY="RELEASE_DEPLOY_KEY_$GITLAB_USER_LOGIN"
+  if [ -z $RELEASE_DEPLOY_KEY ]; then
+    echo No release deploy key \(RELEASE_DEPLOY_KEY or RELEASE_DEPLOY_KEY_$GITLAB_USER_LOGIN\) defined. Aborting.
+    exit 1
+  fi
 fi
 if [ -z $RELEASE_NPM_TOKEN ]; then
-  echo No release npm token \(RELEASE_NPM_TOKEN or RELEASE_NPM_TOKEN_$GITLAB_USER_LOGIN\) defined. Aborting.
-  exit 1
+  declare -n RELEASE_NPM_TOKEN="RELEASE_NPM_TOKEN_$GITLAB_USER_LOGIN"
+  if [ -z $RELEASE_NPM_TOKEN ]; then
+    echo No release npm token \(RELEASE_NPM_TOKEN or RELEASE_NPM_TOKEN_$GITLAB_USER_LOGIN\) defined. Aborting.
+    exit 1
+  fi
 fi
 RELEASE_BRANCH=$CI_COMMIT_BRANCH
 # RELEASE_VERSION can be a version number (exact) or increment keyword (next in sequence)
