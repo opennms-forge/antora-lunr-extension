@@ -336,5 +336,6 @@ Here's a list of projects using the Antora Lunr extension.
 * https://www.uyuni-project.org/uyuni-docs/[Uyuni Documentation]
 * https://source.whitehatsec.com/help/sentinel/[NTT Application Security]
 * https://hub.syn.tools/hub/[Commodore Components Hub (VSHN)]
+* https://datahandwerk.gitlab.io/[DHW - DataHandwerk toolkit mssql]
 
 To add your project to this list, please https://gitlab.com/antora/antora-lunr-extension/-/edit/main/README.adoc[edit this file]!
