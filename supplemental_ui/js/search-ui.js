@@ -1,7 +1,7 @@
 ;(globalThis || window).lunrSiteSearch = (function () {
   /* eslint-disable no-var */
-  const config = document.getElementById('search-script').dataset
-  const siteRootPath = config.siteRootPath || ''
+  var config = document.getElementById('search-script').dataset
+  var siteRootPath = config.siteRootPath || ''
   appendStylesheet(config.stylesheet)
   var searchInput = document.getElementById('search-input')
   var searchResult = document.createElement('div')
