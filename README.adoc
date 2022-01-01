@@ -90,7 +90,7 @@ When using the {url-antora-docs}/playbook/configure-output/#default-output-dir[d
 
 Now that we have a search index (i.e., _search-index.js_), we need to enable the search component in the UI.
 
-Copy the _supplemental_ui_ directory from the npm package at _node_modules/@antora/lunr-extension/supplemental_ui_ in your Antora playbook repository and configure the `ui.supplemental_files` key to point to that location:
+Copy the _supplemental_ui_ directory from the npm package at _node_modules/@antora/lunr-extension/supplemental_ui_ in your Antora playbook repository and configure the {url-antora-docs}/playbook/ui-supplemental-files/#supplemental-files-key[`ui.supplemental_files` key] to point to that location:
 
 .antora-playbook.yml
 [,yaml]
