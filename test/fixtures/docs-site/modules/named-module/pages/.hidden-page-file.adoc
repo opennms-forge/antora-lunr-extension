@@ -1,0 +1,3 @@
+= Hidden Page
+
+Antora won’t load this page file into the content catalog or publish it because its filename begins with a dot (`.`).

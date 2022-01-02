@@ -1,0 +1,4 @@
+= Do Not Index Me
+:noindex:
+
+This content will not show up in the search results.

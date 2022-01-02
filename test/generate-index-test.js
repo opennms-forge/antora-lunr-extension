@@ -442,6 +442,53 @@ describe('generateIndex()', () => {
     )
   })
 
+  it('should not load documents with noindex defined as attribute', () => {
+    playbook.urls = { htmlExtensionStyle: 'indexify' }
+    const contentCatalog = buildContentCatalog(playbook, [
+      {
+        contents: Buffer.from(`
+<html lang="en">
+  <body class="article">
+  </body>
+</html>`),
+        src: {
+          component: 'hello',
+          version: '1.0',
+        },
+        asciidoc: {
+          attributes: {
+            noindex: '',
+          },
+        },
+      },
+      {
+        contents: Buffer.from(`
+<html lang="en">
+  <body class="article">
+  </body>
+</html>`),
+        src: {
+          component: 'hello',
+          version: '1.0',
+          relative: 'features.adoc',
+        },
+      },
+    ])
+    const noindexPage = contentCatalog.getById({
+      family: 'page',
+      component: 'hello',
+      version: '1.0',
+      module: 'ROOT',
+      relative: 'index.adoc',
+    })
+    Object.defineProperty(noindexPage, 'contents', {
+      get: function () {
+        expect.fail('should not request the contents on page that have noindex!')
+      },
+    })
+    generateIndex(playbook, contentCatalog)
+  })
+
   it('should only index the latest version when there are multiple versions and DOCSEARCH_INDEX_VERSION=latest', () => {
     const contentCatalog = buildContentCatalog(playbook, [
       {
