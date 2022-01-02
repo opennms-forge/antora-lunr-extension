@@ -6,6 +6,11 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 
 == Unreleased
 
+=== Added
+
+* Set `SITE_SEARCH_LANGUAGES` env var to a comma-separated list of languages if non-en languages are specified (#17)
+* Automatically manage the search-scripts.hbs partial and remove from supplemental_ui (#17)
+
 === Changed
 
 * Only attempt to load search stylesheet if specified in `data-stylesheet` attribute on search script (#20)
@@ -16,6 +21,10 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 === Fixed
 
 * Fix require statement for PassThrough in lazy-readable.js so it retrieves it from *stream* instead of *readable-stream* (#24)
+
+=== Fixed
+
+* Publish the language support scripts as lunr-languages.js and load it into the browser, if necessary (#17)
 
 == 1.0.0-alpha.1 (2021-12-20)
 

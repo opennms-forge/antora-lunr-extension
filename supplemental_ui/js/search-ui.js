@@ -1,6 +1,6 @@
-;(globalThis || window).lunrSiteSearch = (function () {
+;(function (globalScope) {
   /* eslint-disable no-var */
-  var config = document.getElementById('search-script').dataset
+  var config = document.getElementById('search-ui-script').dataset
   var siteRootPath = config.siteRootPath || ''
   appendStylesheet(config.stylesheet)
   var searchInput = document.getElementById('search-input')
@@ -198,9 +198,9 @@
     }
   }
 
-  function init (lunr, data) {
+  function initSearch (lunr, data) {
     var index = Object.assign({ index: lunr.Index.load(data.index), store: data.store })
-    var debug = 'URLSearchParams' in window && new URLSearchParams(window.location.search).has('lunr-debug')
+    var debug = 'URLSearchParams' in globalScope && new URLSearchParams(globalScope.location.search).has('lunr-debug')
     var search = debounce(function () {
       try {
         searchIndex(index.index, index.store, searchInput.value)
@@ -222,5 +222,5 @@
     })
   }
 
-  return { init: init }
-})()
+  globalScope.initSearch = initSearch
+})(typeof globalThis !== 'undefined' ? globalThis : window)
