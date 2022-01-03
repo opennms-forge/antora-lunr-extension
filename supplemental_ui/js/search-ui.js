@@ -9,6 +9,7 @@
   searchInput.parentNode.appendChild(searchResult)
 
   function appendStylesheet (href) {
+    if (!href) return
     document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'stylesheet', href: href }))
   }
 
