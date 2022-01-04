@@ -442,7 +442,7 @@ describe('generateIndex()', () => {
     )
   })
 
-  it('should not load documents with noindex defined as attribute', () => {
+  it('should not parse pages with noindex defined as attribute', () => {
     playbook.urls = { htmlExtensionStyle: 'indexify' }
     const contentCatalog = buildContentCatalog(playbook, [
       {
@@ -474,19 +474,70 @@ describe('generateIndex()', () => {
         },
       },
     ])
-    const noindexPage = contentCatalog.getById({
-      family: 'page',
-      component: 'hello',
-      version: '1.0',
-      module: 'ROOT',
-      relative: 'index.adoc',
-    })
-    Object.defineProperty(noindexPage, 'contents', {
-      get: function () {
-        expect.fail('should not request the contents on page that have noindex!')
+    Object.defineProperty(
+      contentCatalog.getById({
+        family: 'page',
+        component: 'hello',
+        version: '1.0',
+        module: 'ROOT',
+        relative: 'index.adoc',
+      }),
+      'contents',
+      {
+        get: function () {
+          expect.fail('should not request the contents on page that have noindex!')
+        },
+      }
+    )
+    const index = generateIndex(playbook, contentCatalog)
+    expect(Object.keys(index.store)).to.have.lengthOf(1)
+    expect(index.store).to.have.property('/hello/1.0/features/')
+  })
+
+  it('should not parse or index pages not in latest version when index_latest_only option is set', () => {
+    playbook.urls = { htmlExtensionStyle: 'indexify' }
+    const contentCatalog = buildContentCatalog(playbook, [
+      {
+        contents: Buffer.from(`
+<html lang="en">
+  <body class="article">
+  </body>
+</html>`),
+        src: {
+          component: 'hello',
+          version: '1.0',
+        },
       },
-    })
-    generateIndex(playbook, contentCatalog)
+      {
+        contents: Buffer.from(`
+<html lang="en">
+  <body class="article">
+  </body>
+</html>`),
+        src: {
+          component: 'hello',
+          version: '2.0',
+        },
+      },
+    ])
+    Object.defineProperty(
+      contentCatalog.getById({
+        family: 'page',
+        component: 'hello',
+        version: '1.0',
+        module: 'ROOT',
+        relative: 'index.adoc',
+      }),
+      'contents',
+      {
+        get: function () {
+          expect.fail('should not request the contents on page that is not in latest version!')
+        },
+      }
+    )
+    const index = generateIndex(playbook, contentCatalog, { indexLatestOnly: true })
+    expect(Object.keys(index.store)).to.have.lengthOf(1)
+    expect(index.store).to.have.property('/hello/2.0/')
   })
 
   it('should only index the latest version when there are multiple versions and index_latest_only option is set', () => {

@@ -10,6 +10,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 
 * Only attempt to load search stylesheet if specified in `data-stylesheet` attribute on search script (#20)
 * Don't parse HTML of pages that have the `noindex` AsciiDoc attribute (#19)
+* Don't parse HTML of pages not in the latest version when `index_latest_only` option is set (#23)
 
 == 1.0.0-alpha.1 (2021-12-20)
 
