@@ -489,7 +489,7 @@ describe('generateIndex()', () => {
     generateIndex(playbook, contentCatalog)
   })
 
-  it('should only index the latest version when there are multiple versions and DOCSEARCH_INDEX_VERSION=latest', () => {
+  it('should only index the latest version when there are multiple versions and index_latest_only option is set', () => {
     const contentCatalog = buildContentCatalog(playbook, [
       {
         contents: Buffer.from(`
@@ -659,7 +659,7 @@ describe('generateIndex()', () => {
         </div>
       </article>`
 
-    it('should apply the French stemmer and stopword when DOCSEARCH_LANGS = "fr"', () => {
+    it('should apply the French stemmer and stopword when languages option is "fr"', () => {
       const contentCatalog = buildContentCatalog(playbook, [
         {
           contents: Buffer.from(frenchArticleWithGermanQuoteContent),
@@ -702,7 +702,7 @@ describe('generateIndex()', () => {
       ).to.equal(0)
     })
 
-    it('should apply multiple stemmers and stopwords when DOCSEARCH_LANGS = "fr,de"', () => {
+    it('should apply multiple stemmers and stopwords when languages option is "fr,de"', () => {
       const contentCatalog = buildContentCatalog(playbook, [
         {
           contents: Buffer.from(frenchArticleWithGermanQuoteContent),
@@ -741,7 +741,7 @@ describe('generateIndex()', () => {
       ).to.equal(1)
     })
 
-    it('should apply the default (English) stemmer and stopword when DOCSEARCH_LANGS is empty (en)', () => {
+    it('should apply the default (English) stemmer and stopword when languages option is empty (en)', () => {
       const contentCatalog = buildContentCatalog(playbook, [
         {
           contents: Buffer.from(frenchArticleWithGermanQuoteContent),
