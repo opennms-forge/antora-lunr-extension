@@ -11,6 +11,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 * Only attempt to load search stylesheet if specified in `data-stylesheet` attribute on search script (#20)
 * Don't parse HTML of pages that have the `noindex` AsciiDoc attribute (#19)
 * Don't parse HTML of pages not in the latest version when `index_latest_only` option is set (#23)
+* Build the indexable documents in serial so the parsed HTML for only one page is held in memory at a time (#22)
 
 === Fixed
 
