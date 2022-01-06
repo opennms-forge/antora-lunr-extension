@@ -40,11 +40,17 @@ git branch -f $RELEASE_BRANCH origin/$RELEASE_BRANCH
 mkdir -p -m 700 $HOME/.ssh
 ssh-keygen -F gitlab.com >/dev/null 2>&1 || ssh-keyscan -H -t rsa gitlab.com >> $HOME/.ssh/known_hosts 2>/dev/null
 eval $(ssh-agent -s) >/dev/null
-echo -n "$RELEASE_DEPLOY_KEY" | ssh-add -
+if [ -f "$RELEASE_DEPLOY_KEY" ]; then
+  chmod 600 $RELEASE_DEPLOY_KEY
+  ssh-add -q $RELEASE_DEPLOY_KEY
+else
+  echo -n "$RELEASE_DEPLOY_KEY" | ssh-add -q -
+fi
 exit_code=$?
 if [ $exit_code -gt 0 ]; then
   exit $exit_code
 fi
+echo Deploy key identity added to SSH agent.
 
 # clone the branch from which we're releasing
 git clone -b $RELEASE_BRANCH --no-local . build/$PACKAGE_NAME
@@ -59,9 +65,7 @@ git config user.email "$GITLAB_USER_EMAIL"
 git config user.name "$GITLAB_USER_NAME"
 
 # configure npm client for publishing
-echo "access=public
-tag=$RELEASE_NPM_TAG
-//registry.npmjs.org/:_authToken=\"$RELEASE_NPM_TOKEN\"" > .npmrc
+echo -e "access=public\ntag=$RELEASE_NPM_TAG\n//registry.npmjs.org/:_authToken=\"$RELEASE_NPM_TOKEN\"" > .npmrc
 
 # release!
 (
