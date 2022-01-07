@@ -31,11 +31,11 @@ function markdownify (asciidoc) {
       if (chr0) {
         if (chr0 === ':' || chr0 === '[') {
           line = undefined
-        } else if (line === 'endif::[]') {
+        } else if (line === 'endif::[]' || (line === '|===' && skipping)) {
           line = undefined
-          accum.pop()
+          while (accum[accum.length - 1] === '') accum.pop()
           skipping = false
-        } else if (skipping || line === 'ifdef::badges[]') {
+        } else if (skipping || (line === '|===' && !skipping) || line.startsWith('ifdef::')) {
           line = undefined
           skipping = true
         } else if (chr0 === '=') {

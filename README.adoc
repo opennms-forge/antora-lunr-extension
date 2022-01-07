@@ -145,6 +145,83 @@ $ antora --extension @antora/lunr-extension antora-playbook.yml
 Using the `--extension` option also allows you to enable the extension that's registered in the playbook file, but marked as not enabled using the `enabled` key.
 See {url-antora-docs}/extend/enable-extension/[Enable an Extension] for details about how that works.
 
+=== Searching
+
+Once you have incorporated the Lunr-based search into your site, the next step is to perform a search.
+
+To search, start typing a query (i.e., a word or phrase) into the search box at the top of the page.
+For example:
+
+    install
+
+The search results will be shown under the search box in real time as you type.
+
+[cols=>1s;3,width=75%,frame=none,grid=cols]
+|===
+|Install Antora
+|...ra’s command line interface (Antora CLI) and an Antora site generator pipeline.
+Assumptions: You’ve #installed# an active Node LTS release on your Linux, Windows, or macOS machine.
+On this page, you’ll learn: How...
+
+|Install Antora
+|...e interface (CLI) and the official Antora site generator or a custom one. This page explains how to #install# Antora using its default configuration. Assumptions: You’ve installed an active Node.js LTS release...
+
+|Install and Run Quickstart
+|#Install# Node.js
+
+|Install and Run Quickstart
+|#Install# Antora
+
+|Windows Requirements
+|#Install# Chocolatey
+
+|...
+|...
+|===
+
+The search client will first attempt to find an exact match.
+If that query doesn't return any results, the search client will try a begins with search (e.g., `install*`).
+If that query doesn't return any results, the search client will try a contains search (e.g., `\*install*`).
+If no results are found, the search results will report "`No results found for query`".
+
+NOTE: The search engine applies stemming to terms, so it may also find matches for different forms of the word that have the same meaning (i.e., root words).
+
+Lunr supports searches for multiple terms.
+However, the default behavior may not be what you're used to from using other search engines.
+By default, multiple search terms are combined with an OR operator (i.e., either term).
+Consider the following query:
+
+    install antora
+
+If a document matches _at least one_ of the search terms, the document will show up in the results.
+Documents that contain both terms will score higher and thus show up first.
+
+If you want to search for documents that have all of the terms entered (i.e., required term presence), you must modify those terms.
+To indicate that a term must be present in a matching documents, prefix the term with a `+` (e.g., `+install`).
+To find a document that contains both "`install`" and "`antora`", use the following query:
+
+    +install +antora
+
+CAUTION: Unlike other search engines, Lunr does not support queries that are enclosed in quotes.
+In the future, this extension may automatically translate a query with that syntax to a query with required term presence.
+
+If you only want to search for a term in page titles and section titles, prefix the term with `title:`.
+For example:
+
+    title:install
+
+When searching for titles, only titles will show in the results.
+You will not see text snippets from other areas of the page.
+
+You can search for titles that have all of the specified terms by combining the `title:` prefix with the `+` modifier.
+For example:
+
+    +title:install +title:antora
+
+This extension will likely support more advanced searches in the future, so watch this space to learn about new searching capabilities.
+
+To learn more about how Lunr searches work, see https://lunrjs.com/guides/searching.html[Searching with Lunr].
+
 == Configuration
 
 NOTE: In {url-antora-lunr}[antora-lunr] (the predecessor of this extension), configuration was performed using environment variables.
