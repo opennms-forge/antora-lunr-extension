@@ -307,6 +307,23 @@ antora:
     languages: [en, fr]
 ----
 
+=== Debug invalid queries
+
+By default, the search client will silence the error thrown by Lunr if a query is invalid.
+The client assumes that if the query is invalid, there are no results to present.
+
+If you're trying to debug a query, and you want to see the message of the error Lunr throws, you can put the search client into debug mode.
+To do so, add `?lunr-debug=1` to the end of the URL of the current page and reload the page.
+
+TIP: If the page URL already has a query string, then append `&lunr-debug=1` instead.
+
+When debug mode is enabled, messages about invalid queries will show up in the browser console at the Debug level.
+For example:
+
+    Invalid search query: invalid:term (unrecognised field 'invalid', possible fields: 'title', 'name', 'text', 'component')
+
+The user is not currently notified about an invalid query, though that could change in the future.
+
 == UI assumptions
 
 This section is intended for anyone designing and creating a custom UI.
