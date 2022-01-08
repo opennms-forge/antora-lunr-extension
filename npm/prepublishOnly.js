@@ -55,7 +55,7 @@ function markdownify (asciidoc) {
               (_, img, uri, attrname, pathname, content) =>
                 `${img ? '!' : ''}[${content.split(',')[0]}](${attrname ? attrs[attrname] : uri}${pathname || ''})`
             )
-            .replace(/\*.+?\*/g, '*$&*')
+            .replace(/(?<!\\)\*.+?\*/g, '*$&*')
             .replace(/\b_(.+?)_\b/g, '*$1*')
             .replace(/`\\/g, '`')
             .replace(/^(NOTE|TIP|IMPORTANT):\s/, (_, label) => `${ADMONITION_EMOJI[label]} **${label}:** `)
