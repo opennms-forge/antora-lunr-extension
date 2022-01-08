@@ -182,7 +182,7 @@ On this page, you’ll learn: How...
 The search client will first attempt to find an exact match.
 If that query doesn't return any results, the search client will try a begins with search (e.g., `install*`).
 If that query doesn't return any results, the search client will try a contains search (e.g., `\*install*`).
-If no results are found, the search results will report "`No results found for query`".
+If no results are found, the search results will report “No results found for query”.
 
 NOTE: The search engine applies stemming to terms, so it may also find matches for different forms of the word that have the same meaning (i.e., root words).
 
@@ -198,7 +198,7 @@ Documents that contain both terms will score higher and thus show up first.
 
 If you want to search for documents that have all of the terms entered (i.e., required term presence), you must add a modifier to the terms.
 To indicate that a term must be present in a matching documents, prefix the term with `+` (e.g., `+install`).
-For example, to find a document that contains both "`install`" and "`antora`", use the following query:
+For example, to find a document that contains both “install” and “antora”, use the following query:
 
     +install +antora
 
