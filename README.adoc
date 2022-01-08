@@ -187,7 +187,7 @@ If no results are found, the search results will report "`No results found for q
 NOTE: The search engine applies stemming to terms, so it may also find matches for different forms of the word that have the same meaning (i.e., root words).
 
 Lunr supports searches for multiple terms.
-However, the default behavior may not be what you're used to from using other search engines.
+However, the default behavior may not match your experience using other search engines.
 By default, multiple search terms are combined with an OR operator (i.e., either term).
 Consider the following query:
 
@@ -196,14 +196,14 @@ Consider the following query:
 If a document matches _at least one_ of the search terms, the document will show up in the results.
 Documents that contain both terms will score higher and thus show up first.
 
-If you want to search for documents that have all of the terms entered (i.e., required term presence), you must modify those terms.
-To indicate that a term must be present in a matching documents, prefix the term with a `+` (e.g., `+install`).
-To find a document that contains both "`install`" and "`antora`", use the following query:
+If you want to search for documents that have all of the terms entered (i.e., required term presence), you must add a modifier to the terms.
+To indicate that a term must be present in a matching documents, prefix the term with `+` (e.g., `+install`).
+For example, to find a document that contains both "`install`" and "`antora`", use the following query:
 
     +install +antora
 
 CAUTION: Unlike other search engines, Lunr does not support queries that are enclosed in quotes.
-In the future, this extension may automatically translate a query with that syntax to a query with required term presence.
+In the future, this extension may automatically translate a query with that syntax into a query that uses required term presence.
 
 If you only want to search for a term in page titles and section titles, prefix the term with `title:`.
 For example:
