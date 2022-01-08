@@ -98,4 +98,17 @@ describe('generateSite()', () => {
     expect($('#search-input')).to.have.lengthOf(0)
     expect($('#search-ui-script')).to.have.lengthOf(0)
   })
+
+  it('should throw error if unknown options are specified in playbook', async () => {
+    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-unknown-options.yml')
+    const expectedMessage = 'Unrecognized options specified for @antora/lunr-extension: foo, yin'
+    expect(
+      await generateSite(['--playbook', playbookFile], {}).then(
+        (result) => () => result,
+        (err) => () => {
+          throw err
+        }
+      )
+    ).to.throw(expectedMessage)
+  })
 })
