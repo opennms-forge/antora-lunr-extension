@@ -10,6 +10,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 
 * Set `SITE_SEARCH_LANGUAGES` env var to a comma-separated list of languages if non-en languages are specified (#17)
 * Automatically manage the search-scripts.hbs partial and remove from supplemental_ui (#17)
+* Allow length of snippets in search results to be configured using `snippet_length` key (#14)
 
 === Changed
 
