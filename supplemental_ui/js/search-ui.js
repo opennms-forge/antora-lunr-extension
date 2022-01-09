@@ -1,6 +1,7 @@
 ;(function (globalScope) {
   /* eslint-disable no-var */
   var config = document.getElementById('search-ui-script').dataset
+  var snippetLength = parseInt(config.snippetLength || 100, 10)
   var siteRootPath = config.siteRootPath || ''
   appendStylesheet(config.stylesheet)
   var searchInput = document.getElementById('search-input')
@@ -25,9 +26,8 @@
 
     var end = start + length
     var textEnd = text.length - 1
-    var contextOffset = 100
-    var contextAfter = end + contextOffset > textEnd ? textEnd : end + contextOffset
-    var contextBefore = start - contextOffset < 0 ? 0 : start - contextOffset
+    var contextAfter = end + snippetLength > textEnd ? textEnd : end + snippetLength
+    var contextBefore = start - snippetLength < 0 ? 0 : start - snippetLength
     if (start === 0 && end === textEnd) {
       hits.push(highlightSpan)
     } else if (start === 0) {

@@ -268,6 +268,23 @@ asciidoc:
 The indexer will also look for the `robots` meta tag in HTML document and exclude the page if the value of the content attribute is `noindex`.
 That allows you to exclude pages that were either not created from AsciiDoc or that contain a meta robots tag that was added by the UI template based on another condition.
 
+=== Snippet length
+
+By default, the maximum length of a snippet in a search result is 100 characters.
+To change this length, set the `snippet_length` configuration key:
+
+.antora-playbook.yml
+[,yaml]
+----
+antora:
+  extensions:
+  - require: '@antora/lunr-extension'
+    snippet_length: 250
+----
+
+The value of this option is an upper limit.
+The length of the snippet will not exceed the length of the matched text.
+
 === Support for other languages
 
 By default, Lunr only supports English as an indexing language.
