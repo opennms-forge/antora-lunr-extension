@@ -15,19 +15,19 @@ image:{url-gitlab-badges}/pipeline.svg[link="{url-repo}/-/pipelines?scope=finish
 image:{url-gitlab-badges}/coverage.svg[link="{url-repo}/-/jobs?scope=finished",title="coverage report"]
 endif::[]
 
-https://lunrjs.com[Lunr] provides a great search experience without the need for external, server-side search services.
+https://lunrjs.com[Lunr] provides a great search experience for readers without having to rely on external search services.
 With this extension, you can add _offline_, full-text search powered by Lunr to your Antora documentation site.
 
-NOTE: The Antora Lunr Extension is designed for and is compatible with {url-antora-docs}/whats-new/[Antora 3.0 and newer].
-To integrate Lunr with an earlier version of Antora, you must use {url-antora-lunr}[antora-lunr] instead.
+NOTE: The Antora Lunr Extension is designed for and compatible with {url-antora-docs}/whats-new/[Antora 3.0 and newer].
+If you're using an earlier version of Antora, you must use {url-antora-lunr}[antora-lunr] instead.
 
-To add Lunr search to your Antora documentation site, you need to install the extension package, register the extension in your Antora playbook file, and add the search interface to the pages of your site.
+To add search functionality powered by Lunr to your Antora documentation site, you need to install this extension package, register the extension in your Antora playbook file, and add the search interface to the pages in your site.
 Let's get started.
 
 == Prerequisites
 
 In order to use this extension, you must be using at least Node.js 16 and Antora 3.
-We also assume you have configured an Antora playbook file (i.e., _antora-playbook.yml_) to build your site.
+We assume you've already set up an Antora playbook file (i.e., _antora-playbook.yml_) to build your site.
 
 == Installation
 
@@ -45,10 +45,10 @@ You also have the option of installing the extension globally by adding the `-g`
 $ npm i -g @antora/lunr-extension
 ----
 
-However, we strongly recommend installing dependencies into the playbook project.
-This strategy makes it easier to manage dependencies, documents those dependencies clearly, and keeps the dependencies of the current site isolated from others.
+We strongly recommend installing dependencies into your playbook project.
+This strategy makes it easier to manage the dependencies, clearly documents those dependencies, and ensures the build is portable and isolated from other sites.
 
-The previous two commands will download and install the latest release of this software from the npm registry.
+Both of the previous two commands download and install the latest release of this software from the npm registry.
 If you want to use the development version, you can replace the name of the package with the URL of the git repository.
 
 [,console,subs=+attributes]
@@ -60,12 +60,30 @@ Although the software in the git repository is regularly and rigorously tested, 
 
 == Usage
 
+This section explains how to activate the Lunr integration and how to use the search interface it provides.
+
 === Register the extension
 
 Now that you have the Lunr extension installed, you need to {url-antora-docs}/extend/register-extension/[register the extension] with Antora.
-To register the extension, add an entry to the `antora.extensions` key in your {url-antora-docs}/playbook/[Antora playbook file].
+To register the extension, you'll add an entry that cites the name of the package to the `antora.extensions` key in your {url-antora-docs}/playbook/[Antora playbook file].
 
 Open the Antora playbook file and add the extension as follows:
+
+.antora-playbook.yml
+[,yaml]
+----
+antora:
+  extensions:
+  - '@antora/lunr-extension'
+----
+
+If you don't need to specify any configuration keys, the entry in `antora.extensions` can be the name of the package.
+In this case, quotes are required around the package name since `@` is a special character in YAML.
+
+TIP: Alternately, you can register the extension when you run the `antora` command using the `--extension` option.
+
+In order to specify configuration keys for the extension, you must change the entry to a map syntax.
+When using the map syntax, the package name must be preceded by the `require` key, as shown here:
 
 .antora-playbook.yml
 [,yaml]
@@ -75,22 +93,20 @@ antora:
   - require: '@antora/lunr-extension'
 ----
 
-NOTE: The `require:` prefix on the `extensions` entry is only necessary if you intend to specify additional configuration keys.
-The prefix is shown here so you don't have to remember to add it later.
-
-TIP: Alternately, you can register the extension when you run the `antora` command by using the `--extension` option.
+You may want to start with this syntax so you don't have to remember to switch to it later when you want to specify configuration.
 
 === Generate an index file
 
-When you generate your documentation site the next time, the extension will automatically generate an index file at the root of your output directory.
+The next time you build your documentation site, the extension will automatically generate a search index and write it to a file named _search-index.js_ at the root of the site.
 The location of this file depends on the value of `output.dir` key in your playbook.
 When using the {url-antora-docs}/playbook/configure-output/#default-output-dir[default output dir], that location is _build/site/search-index.js_.
 
 === Enable the search interface
 
-Now that we have a search index (i.e., _search-index.js_), we need to enable the search component in the UI.
+Now that we have the search index in place, we need to enable the search component in the UI.
 
-Copy the _supplemental_ui_ directory from the npm package at _node_modules/@antora/lunr-extension/supplemental_ui_ in your Antora playbook repository and configure the {url-antora-docs}/playbook/ui-supplemental-files/#supplemental-files-key[`ui.supplemental_files` key] to point to that location:
+First, copy the files in the _supplemental_ui_ directory of the installed package, located at _node_modules/@antora/lunr-extension/supplemental_ui_, into the _supplemental_ui_ directory in your Antora playbook repository.
+Then, configure the {url-antora-docs}/playbook/ui-supplemental-files/#supplemental-files-key[ui.supplemental_files key] to point to that location:
 
 .antora-playbook.yml
 [,yaml]
@@ -102,7 +118,7 @@ ui:
   supplemental_files: ./supplemental_ui
 ----
 
-If you're not already using a supplemental UI, you can point directly to the _supplemental_ui_ directory in the npm package to avoid having to copy (and maintain) it.
+If you're not already using a supplemental UI, you can point the `supplemental_files` key directly to the _supplemental_ui_ directory of the installed package to avoid having to copy (and thus maintain) it.
 
 .antora-playbook.yml
 [,yaml]
@@ -114,21 +130,25 @@ ui:
   supplemental_files: ./node_modules/@antora/lunr-extension/supplemental_ui
 ----
 
+In the future, the supplemental UI requirement of this extension will likely be phased out.
+
 === Set (or don't set) the site URL
 
-You can set the site URL in the playbook to any allowable value and the search will work regardless.
-(See the docs for the {url-antora-docs}/playbook/site-url/#url-key[site.url key] for details).
-In fact, the `site.url` key doesn't even have to be set.
+The search is not coupled to the value of the site URL.
+That means you can set the site URL in the playbook to any allowable value and the search will work regardless.
+(See the docs for the {url-antora-docs}/playbook/site-url/#url-key[site.url key] for a list of allowable values).
+In fact, you don't have to set the site URL at all.
+This works because the URLs in the search results are always computed _relative to the current page_.
+They are not absolute URLs.
 
 TIP: If you're using the https://www.npmjs.com/package/http-server[http-server] module to provide an HTTP server to view your site locally, you can set the `site.url` key to `+http://localhost:8080+` to emulate the conditions of a production environment.
 
-The search works independent of the site URL because the URLs in the search results are computed _relative to the current page_.
-That means the browser will resolve them regardless of where the site is deployed or on what page the search is used.
+Thanks to the use of relative URLs in the search results, the browser is able to resolve URLs in the results regardless of where the site is deployed or on what page the search is used.
 You can even use the search when viewing the site offline through a file URI.
 
 === Generate the site
 
-If you have registered the extension in your playbook file, then you can generate your site using the `antora` command without having to pass any additional options or environment variables.
+If you registered the extension in your playbook file, you can generate your site using the `antora` command without having to pass any additional options or environment variables.
 
 [,console]
 ----
@@ -223,6 +243,13 @@ This extension will likely support more advanced searches in the future, so watc
 To learn more about how Lunr searches work, see https://lunrjs.com/guides/searching.html[Searching with Lunr].
 
 == Configuration
+
+This section explains how to control the behavior of this integration using configuration keys and other settings.
+
+In order to specify configuration keys, the entry in the `antora.extensions` key must use the map syntax.
+When using this form, you specify the package name using the `require` key.
+The configuration keys should be siblings of the `require` key.
+Only the `require` key should be prefixed with the entry marker, `-`.
 
 NOTE: In {url-antora-lunr}[antora-lunr] (the predecessor of this extension), configuration was performed using environment variables.
 In this extension, configuration is now done using configuration keys in the playbook.
@@ -462,6 +489,7 @@ Here's a list of projects using the Antora Lunr extension.
 
 * https://documentation.suse.com/external-tree/en-us/suma/4.0/suse-manager/[SUSE Manager Documentation]
 * https://www.uyuni-project.org/uyuni-docs/[Uyuni Documentation]
+* https://blt-guide.deepsymmetry.org[Beat Link Trigger]
 * https://source.whitehatsec.com/help/sentinel/[NTT Application Security]
 * https://hub.syn.tools/hub/[Commodore Components Hub (VSHN)]
 * https://datahandwerk.gitlab.io/[DHW - DataHandwerk toolkit mssql]
