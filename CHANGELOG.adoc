@@ -18,6 +18,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 * Don't parse HTML of pages that have the `noindex` AsciiDoc attribute (#19)
 * Don't parse HTML of pages not in the latest version when `index_latest_only` option is set (#23)
 * Build the indexable documents in serial so the parsed HTML for only one page is held in memory at a time (#22)
+* Close search on click outside search interface instead of on blur (#25)
 
 === Fixed
 

@@ -147,6 +147,11 @@
     return searchResultItem
   }
 
+  function clearSearchResults (reset) {
+    if (reset === true) searchInput.value = ''
+    searchResult.innerHTML = ''
+  }
+
   function search (index, text) {
     // execute an exact match search
     var result = index.search(text)
@@ -164,10 +169,7 @@
   }
 
   function searchIndex (index, store, text) {
-    // reset search result
-    while (searchResult.firstChild) {
-      searchResult.removeChild(searchResult.firstChild)
-    }
+    clearSearchResults(false)
     if (text.trim() === '') {
       return
     }
@@ -180,6 +182,10 @@
     } else {
       searchResultDataset.appendChild(createNoResult(text))
     }
+  }
+
+  function confineEvent (e) {
+    e.stopPropagation()
   }
 
   function debounce (func, wait, immediate) {
@@ -201,25 +207,22 @@
   function initSearch (lunr, data) {
     var index = Object.assign({ index: lunr.Index.load(data.index), store: data.store })
     var debug = 'URLSearchParams' in globalScope && new URLSearchParams(globalScope.location.search).has('lunr-debug')
-    var search = debounce(function () {
-      try {
-        searchIndex(index.index, index.store, searchInput.value)
-      } catch (err) {
-        if (debug) console.debug('Invalid search query: ' + searchInput.value + ' (' + err.message + ')')
-      }
-    }, 100)
-    searchInput.addEventListener('keydown', search)
-
-    searchInput.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape') searchInput.value = ''
-    })
-
-    // this is prevented in case of mousedown attached to SearchResultItem
-    searchInput.addEventListener('blur', function (e) {
-      while (searchResult.firstChild) {
-        searchResult.removeChild(searchResult.firstChild)
-      }
-    })
+    searchInput.addEventListener(
+      'keydown',
+      debounce(function (e) {
+        if (e.key === 'Escape' || e.key === 'Esc') return clearSearchResults(true)
+        try {
+          var query = searchInput.value
+          if (!query) return clearSearchResults()
+          searchIndex(index.index, index.store, searchInput.value)
+        } catch (err) {
+          if (debug) console.debug('Invalid search query: ' + query + ' (' + err.message + ')')
+        }
+      }, 100)
+    )
+    searchInput.addEventListener('click', confineEvent)
+    searchResult.addEventListener('click', confineEvent)
+    document.documentElement.addEventListener('click', clearSearchResults)
   }
 
   globalScope.initSearch = initSearch
