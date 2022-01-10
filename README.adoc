@@ -348,6 +348,12 @@ This extension relies on a contract with the UI in order to minimize the configu
 Antora's default UI fulfills this contract.
 For custom UIs, the assumptions of this contract are documented here.
 
+=== lunr.js script
+
+The extension provides the lunr.js script.
+Your UI should not include it.
+If it does, you will get a duplicate file error.
+
 === Environment variable
 
 When this extension is enabled, it sets the `SITE_SEARCH_PROVIDER` environment variable to the value `lunr`.
