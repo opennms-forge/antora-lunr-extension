@@ -6,6 +6,7 @@ const README_HIDDEN = '.' + README_SRC
 const README_DEST = 'README.md'
 const ADMONITION_EMOJI = { NOTE: '📌', TIP: '💡', IMPORTANT: '❗' }
 
+const AttrRefRx = /\{([a-z0-9_-]+)\}/g
 // eslint-disable-next-line prefer-regex-literals
 const RefMacroRx = new RegExp('(image:)?(?:(https?:[^\\[]+)|{([a-z0-9_-]+)}([^[ ]+)?)\\[(|.*?[^\\\\])\\]', 'g')
 
@@ -21,6 +22,7 @@ function markdownify (asciidoc) {
       return accum
     }, {})
   let verbatim = false
+  let subAttributes = false
   let skipping = false
   let prev
   return asciidoc
@@ -45,10 +47,16 @@ function markdownify (asciidoc) {
         } else if (line === '----') {
           line = '```'
           if ((verbatim = !verbatim)) {
-            const lang = prev && prev.charAt(0) === '[' ? prev.substr(1, prev.length - 2).split(',')[1] : undefined
-            if (lang) line += lang
+            subAttributes = false
+            if (prev && prev.charAt(0) === '[') {
+              const blockAttrs = prev.substr(1, prev.length - 2).split(',')
+              if (blockAttrs[1]) line += blockAttrs[1]
+              if (blockAttrs.includes('subs=+attributes')) subAttributes = true
+            }
           }
-        } else if (!verbatim && chr0 !== ' ') {
+        } else if (verbatim) {
+          if (subAttributes) line = line.replace(AttrRefRx, (_, attrname) => attrs[attrname])
+        } else if (chr0 !== ' ') {
           line = line
             .replace(
               RefMacroRx,
