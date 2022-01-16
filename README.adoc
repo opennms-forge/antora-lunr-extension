@@ -141,7 +141,7 @@ In fact, you don't have to set the site URL at all.
 This works because the URLs in the search results are always computed _relative to the current page_.
 They are not absolute URLs.
 
-TIP: If you're using the https://www.npmjs.com/package/http-server[http-server] module to provide an HTTP server to view your site locally, you can set the `site.url` key to `+http://localhost:8080+` to emulate the conditions of a production environment.
+TIP: If you're using the https://www.npmjs.com/package/http-server[http-server] module to provide an HTTP server to view your site locally, you can set the `site.url` key to `\http://localhost:8080` to emulate the conditions of a production environment.
 
 Thanks to the use of relative URLs in the search results, the browser is able to resolve URLs in the results regardless of where the site is deployed or on what page the search is used.
 You can even use the search when viewing the site offline through a file URI.
