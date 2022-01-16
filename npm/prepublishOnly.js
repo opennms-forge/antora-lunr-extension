@@ -43,7 +43,7 @@ function markdownify (asciidoc) {
         } else if (chr0 === '.' && line.charAt(1) !== ' ') {
           line = `**${line.substr(1)}**\n`
         } else if (line === '----') {
-          line = '````'
+          line = '```'
           if ((verbatim = !verbatim)) {
             const lang = prev && prev.charAt(0) === '[' ? prev.substr(1, prev.length - 2).split(',')[1] : undefined
             if (lang) line += lang
