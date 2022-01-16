@@ -13,6 +13,7 @@ endif::[]
 ifdef::badges[]
 image:{url-gitlab-badges}/pipeline.svg[link="{url-repo}/-/pipelines?scope=finished&page=1&ref=main",title="pipeline status"]
 image:{url-gitlab-badges}/coverage.svg[link="{url-repo}/-/jobs?scope=finished",title="coverage report"]
+image:https://img.shields.io/npm/v/@antora/lunr-extension[link="https://www.npmjs.com/package/@antora/lunr-extension",title="npm version"]
 endif::[]
 
 https://lunrjs.com[Lunr] provides a great search experience for readers without having to rely on external search services.
