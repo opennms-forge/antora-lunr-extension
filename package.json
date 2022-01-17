@@ -35,6 +35,7 @@
     "postpublish": "node npm/postpublish.js"
   },
   "files": [
+    "data",
     "lib",
     "supplemental_ui"
   ],
