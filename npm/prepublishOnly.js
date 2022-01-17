@@ -4,7 +4,7 @@ const { promises: fsp } = require('fs')
 const README_SRC = 'README.adoc'
 const README_HIDDEN = '.' + README_SRC
 const README_DEST = 'README.md'
-const ADMONITION_EMOJI = { NOTE: '📌', TIP: '💡', IMPORTANT: '❗' }
+const ADMONITION_EMOJI = { CAUTION: '🔥', IMPORTANT: '❗', NOTE: '📌', TIP: '💡' }
 
 const AttrRefRx = /\{([a-z0-9_-]+)\}/g
 // eslint-disable-next-line prefer-regex-literals
@@ -66,7 +66,7 @@ function markdownify (asciidoc) {
             .replace(/(?<!\\)\*.+?\*/g, '*$&*')
             .replace(/\b_(.+?)_\b/g, '*$1*')
             .replace(/`\\/g, '`')
-            .replace(/^(NOTE|TIP|IMPORTANT):\s/, (_, label) => `${ADMONITION_EMOJI[label]} **${label}:** `)
+            .replace(/^(CAUTION|IMPORTANT|NOTE|TIP):\s/, (_, label) => `${ADMONITION_EMOJI[label]} **${label}:** `)
         }
       }
       if (line !== undefined) accum.push(line)
