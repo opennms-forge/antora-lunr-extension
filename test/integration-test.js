@@ -96,6 +96,16 @@ describe('generateSite()', () => {
     expect(searchScript.attr('data-snippet-length')).to.equal('250')
   })
 
+  it('should use existing search-scripts.hbs partial if present in UI', async () => {
+    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-custom-supplemental-ui.yml')
+    await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    const startPageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr/index.html'))
+    const searchScript = cheerio.load(startPageContents)('#search-ui-script')
+    expect(searchScript).to.have.lengthOf(1)
+    expect(searchScript.attr('data-snippet-length')).to.equal('150')
+    expect(searchScript.attr('data-stylesheet')).to.be.undefined()
+  })
+
   it('should not generate search index or add scripts to pages if extension is not enabled', async () => {
     playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-without-extension.yml')
     const env = {}
