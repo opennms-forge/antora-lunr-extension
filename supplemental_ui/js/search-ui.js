@@ -1,3 +1,4 @@
+/* global CustomEvent */
 ;(function (globalScope) {
   /* eslint-disable no-var */
   var config = document.getElementById('search-ui-script').dataset
@@ -204,8 +205,22 @@
     }
   }
 
+  function enableSearchInput (enabled) {
+    searchInput.disabled = !enabled
+    searchInput.title = enabled ? '' : 'Loading index...'
+  }
+
   function initSearch (lunr, data) {
+    var start = performance.now()
     var index = Object.assign({ index: lunr.Index.load(data.index), store: data.store })
+    enableSearchInput(true)
+    searchInput.dispatchEvent(
+      new CustomEvent('loadedindex', {
+        detail: {
+          took: performance.now() - start,
+        },
+      })
+    )
     var debug = 'URLSearchParams' in globalScope && new URLSearchParams(globalScope.location.search).has('lunr-debug')
     searchInput.addEventListener(
       'keydown',
@@ -224,6 +239,9 @@
     searchResult.addEventListener('click', confineEvent)
     document.documentElement.addEventListener('click', clearSearchResults)
   }
+
+  // disable the search input until the index is loaded
+  enableSearchInput(false)
 
   globalScope.initSearch = initSearch
 })(typeof globalThis !== 'undefined' ? globalThis : window)

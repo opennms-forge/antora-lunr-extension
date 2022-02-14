@@ -243,6 +243,24 @@ This extension will likely support more advanced searches in the future, so watc
 
 To learn more about how Lunr searches work, see https://lunrjs.com/guides/searching.html[Searching with Lunr].
 
+=== Loading the search index
+
+Depending on the index size, it can take a few seconds to download and load a pre-built index.
+While loading the pre-built index, the search input will be disabled.
+Once the index is loaded, the search input will become active and the user will be able to perform a search.
+
+In addition, an event will be published on the search input element.
+You can add an event listener if you want to be notified when the index is loaded:
+
+[,js]
+----
+const searchInput = document.getElementById('search-input')
+searchInput.addEventListener('loadedindex', (event) => {
+  console.log(`Index loaded in: ${event.detail.took}ms`) // <1>
+})
+----
+<1> The event contains the time spent loading the index in milliseconds
+
 == Configuration
 
 This section explains how to control the behavior of this integration using configuration keys and other settings.
