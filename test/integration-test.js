@@ -28,11 +28,11 @@ describe('generateSite()', () => {
     global.lunr = {}
     global.initSearch = function (lunr, index) {
       expect(Object.keys(index.store).length).to.equal(2)
-      expect(index.store['/antora-lunr/index.html']).to.include({
+      expect(index.store[1]).to.include({
         title: 'Antora x Lunr',
         url: '/antora-lunr/index.html',
       })
-      expect(index.store['/antora-lunr/named-module/the-page.html']).to.include({
+      expect(index.store[2]).to.include({
         title: 'The Page',
         url: '/antora-lunr/named-module/the-page.html',
       })

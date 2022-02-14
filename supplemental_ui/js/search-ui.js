@@ -100,13 +100,13 @@
 
   function createSearchResult (result, store, searchResultDataset) {
     result.forEach(function (item) {
-      var url = item.ref
+      var doc = store[item.ref]
+      var url = doc.url
       var hash
       if (url.includes('#')) {
         hash = url.substring(url.indexOf('#') + 1)
         url = url.replace('#' + hash, '')
       }
-      var doc = store[url]
       var metadata = item.matchData.metadata
       var hits = highlightHit(metadata, hash, doc)
       searchResultDataset.appendChild(createSearchResultItem(doc, item, hits))
@@ -120,7 +120,7 @@
     var documentHit = document.createElement('div')
     documentHit.classList.add('search-result-document-hit')
     var documentHitLink = document.createElement('a')
-    documentHitLink.href = siteRootPath + item.ref
+    documentHitLink.href = siteRootPath + doc.url
     documentHit.appendChild(documentHitLink)
     hits.forEach(function (hit) {
       documentHitLink.appendChild(hit)
