@@ -4,6 +4,13 @@
 This document provides a summary of all notable changes to this project grouped by release.
 For a detailed view of what's changed, refer to the {url-repo}/commits[commit history] of this project.
 
+== Unreleased
+
+=== Changed
+
+* Use numerical identifiers in order to reduce the index size (#33)
+* Disable the search bar until the index is loaded and publish an event (#34)
+
 == 1.0.0-alpha.4 (2022-01-27)
 
 === Fixed
