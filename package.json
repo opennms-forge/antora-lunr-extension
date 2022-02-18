@@ -1,6 +1,6 @@
 {
   "name": "@antora/lunr-extension",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "An Antora extension that adds offline, full-text search powered by Lunr to your Antora documentation site.",
   "license": "MPL-2.0",
   "author": "Guillaume Grossetie <g.grossetie@gmail.com>",
