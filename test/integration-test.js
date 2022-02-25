@@ -15,14 +15,21 @@ describe('generateSite()', () => {
   const cacheDir = ospath.join(WORK_DIR, '.cache/antora')
   const outputDir = ospath.join(WORK_DIR, 'public')
   const defaultPlaybookFile = ospath.join(FIXTURES_DIR, 'docs-site/antora-playbook.yml')
-  const playbookFileWithCustomSupplementalUi = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-custom-supplemental-ui.yml')
+  const playbookFileWithCustomSupplementalUi = ospath.join(
+    FIXTURES_DIR,
+    'docs-site',
+    'antora-playbook-with-custom-supplemental-ui.yml'
+  )
 
   beforeEach(() => fsp.rm(outputDir, { recursive: true, force: true }))
   after(() => fsp.rm(WORK_DIR, { recursive: true, force: true }))
 
   it('should generate a site with a search index', async () => {
     const env = {}
-    await generateSite(['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], env)
+    await generateSite(
+      ['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'],
+      env
+    )
     expect(env).to.not.have.property('SITE_SEARCH_PROVIDER')
     const searchIndexPath = ospath.join(outputDir, 'search-index.js')
     expect(searchIndexPath).to.be.a.file()
@@ -30,9 +37,8 @@ describe('generateSite()', () => {
     global.antoraSearch = {}
     global.antoraSearch.initSearch = function (lunr, index) {
       expect(Object.keys(index.store).length).to.equal(2)
-      expect(Object
-        .entries(index.store)
-        .map(([key, value]) => ({ title: value.title, url: value.url }))
+      expect(
+        Object.entries(index.store).map(([key, value]) => ({ title: value.title, url: value.url }))
       ).to.deep.include.members([
         {
           title: 'Antora x Lunr',
@@ -50,7 +56,10 @@ describe('generateSite()', () => {
   })
 
   it('should insert script element with predefined data attributes', async () => {
-    await generateSite(['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    await generateSite(
+      ['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'],
+      {}
+    )
     const startPageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr/index.html'))
     let $ = cheerio.load(startPageContents)
     expect($('#search-input')).to.have.lengthOf(1)
@@ -67,7 +76,10 @@ describe('generateSite()', () => {
   })
 
   it('should output lunr.js client/engine to js vendor directory of UI output folder', async () => {
-    await generateSite(['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    await generateSite(
+      ['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'],
+      {}
+    )
     const expected = ospath.join(outputDir, '_/js/vendor/lunr.js')
     expect(expected).to.be.a.file().and.equal(require.resolve('lunr/lunr.min.js'))
     const thePageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr/named-module/the-page.html'))
@@ -157,7 +169,10 @@ describe('generateSite()', () => {
   })
 
   it('should use existing search-scripts.hbs partial if present in UI', async () => {
-    await generateSite(['--playbook', playbookFileWithCustomSupplementalUi, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    await generateSite(
+      ['--playbook', playbookFileWithCustomSupplementalUi, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'],
+      {}
+    )
     const startPageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr/index.html'))
     const searchScript = cheerio.load(startPageContents)('#search-ui-script')
     expect(searchScript).to.have.lengthOf(1)
@@ -191,26 +206,42 @@ describe('generateSite()', () => {
   })
 
   it('should output search.css to css directory of UI output folder', async () => {
-    await generateSite(['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    await generateSite(
+      ['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'],
+      {}
+    )
     const expected = ospath.join(outputDir, '_/css/search.css')
     expect(expected).to.be.a.file().and.equal(ospath.join(__dirname, '..', 'data', 'css', 'search.css'))
   })
 
   it('should output search-ui.js to js directory of UI output folder', async () => {
-    await generateSite(['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    await generateSite(
+      ['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'],
+      {}
+    )
     const expected = ospath.join(outputDir, '_/js/search-ui.js')
     expect(expected).to.be.a.file().and.equal(ospath.join(__dirname, '..', 'data', 'js', 'search-ui.js'))
   })
 
   it('should preserve existing search.css', async () => {
-    await generateSite(['--playbook', playbookFileWithCustomSupplementalUi, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    await generateSite(
+      ['--playbook', playbookFileWithCustomSupplementalUi, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'],
+      {}
+    )
     const expected = ospath.join(outputDir, '_/css/search.css')
-    expect(expected).to.be.a.file().and.equal(ospath.join(__dirname, 'fixtures', 'docs-site', 'custom-supplemental-ui', 'css', 'search.css'))
+    expect(expected)
+      .to.be.a.file()
+      .and.equal(ospath.join(__dirname, 'fixtures', 'docs-site', 'custom-supplemental-ui', 'css', 'search.css'))
   })
 
   it('should preserve existing search-ui.js', async () => {
-    await generateSite(['--playbook', playbookFileWithCustomSupplementalUi, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    await generateSite(
+      ['--playbook', playbookFileWithCustomSupplementalUi, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'],
+      {}
+    )
     const expected = ospath.join(outputDir, '_/js/search-ui.js')
-    expect(expected).to.be.a.file().and.equal(ospath.join(__dirname, 'fixtures', 'docs-site', 'custom-supplemental-ui', 'js', 'search-ui.js'))
+    expect(expected)
+      .to.be.a.file()
+      .and.equal(ospath.join(__dirname, 'fixtures', 'docs-site', 'custom-supplemental-ui', 'js', 'search-ui.js'))
   })
 })

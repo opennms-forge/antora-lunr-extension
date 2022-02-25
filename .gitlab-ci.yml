@@ -76,6 +76,10 @@ test:node-16-linux:
 test:node-17-linux:
   extends: .npm
   image: node:17-$LINUX_DISTRO
+  artifacts:
+    when: always
+    reports:
+      junit: reports/tests-xunit.xml
 release:
   stage: deploy
   interruptible: false
@@ -83,3 +87,12 @@ release:
   <<: *if_release
   script:
   - npm/release.sh
+test:windows:
+  extends: .npm
+  tags:
+    - windows
+    - exoscale
+  artifacts:
+    when: always
+    reports:
+      junit: reports/tests-xunit.xml

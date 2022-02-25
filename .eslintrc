@@ -1,5 +1,6 @@
 {
   "extends": "standard",
+  "ignorePatterns": ["data/js/search-ui.js"],
   "rules": {
     "array-callback-return": "off",
     "arrow-parens": ["error", "always"],

@@ -5,7 +5,6 @@ const config = {
     if (!this.failures) logCoverageReportPath()
   },
   require: __filename,
-  spec: resolveSpec(),
   timeout: 10 * 60 * 1000,
 }
 
@@ -26,11 +25,6 @@ function logCoverageReportPath () {
     ? `https://gitlab.com/${CI_PROJECT_PATH}/-/jobs/${CI_JOB_ID}/artifacts/file/${coverageReportRelpath}`
     : require('url').pathToFileURL(coverageReportRelpath)
   console.log(`Coverage report: ${coverageReportURL}`)
-}
-
-function resolveSpec () {
-  const spec = process.argv[2]
-  return spec && !spec.startsWith('-') ? spec : 'test/**/*-test.js'
 }
 
 module.exports = config

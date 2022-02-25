@@ -29,9 +29,9 @@
     "pretest": "npm run build",
     "build": "npx rollup -c rollup.config.js",
     "coverage": "nyc npm t",
-    "format": "node npm/format.js lib,test,npm,supplemental_ui",
+    "format": "node npm/format.js lib,test,npm,data",
     "lint": "eslint lib test npm data --ext js,mjs",
-    "test": "_mocha test",
+    "test": "_mocha",
     "version": "node npm/version.js",
     "prepublishOnly": "node npm/prepublishOnly.js",
     "postpublish": "node npm/postpublish.js"
