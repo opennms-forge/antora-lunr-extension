@@ -610,6 +610,89 @@ describe('generateIndex()', () => {
     expect(index.index.search('spinnacle').length).to.equal(1)
   })
 
+  it('should index section titles', () => {
+    playbook.urls = { htmlExtensionStyle: 'indexify' }
+    const contentCatalog = buildContentCatalog(playbook, [
+      {
+        contents: Buffer.from(`
+          <html lang="en">
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width,initial-scale=1">
+              <title>Antora Documentation :: Antora Docs</title>
+              <meta name="keywords" content="Docs as Code, DocOps, content management system, docs writers, publish software documentation, CI and docs, CD and docs">
+              <meta name="generator" content="Antora 2.0.0">
+            </head>
+            <body class="article">
+              <main role="main">
+                <article class="doc">
+                  <h1 class="page">Antora Documentation</h1>
+                  <div class="sect1">
+                    <h2 id="manage-docs-as-code"><a class="anchor" href="#manage-docs-as-code"></a>Manage docs as code</h2>
+                    <div class="sectionbody">
+                      <div class="paragraph">
+                        <p>With Antora, you manage <strong>docs as code</strong>.
+                        That means your documentation process benefits from the same practices used to produce successful software.</p>
+                      </div>
+                      <div class="paragraph">
+                        <p>Some of these practices include:</p>
+                      </div>
+                      <div class="ulist">
+                        <ul>
+                          <li>
+                            <p>Storing content in a version control system.</p>
+                          </li>
+                          <li>
+                            <p>Separating content, configuration, and presentation.</p>
+                          </li>
+                          <li>
+                            <p>Leveraging automation for compilation, validation, verification, and publishing.</p>
+                          </li>
+                          <li>
+                            <p>Reusing shared materials (DRY).</p>
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="paragraph">
+                        <p>Antora helps you incorporate these practices into your documentation workflow.
+                        As a result, your documentation is much easier to manage, maintain, and enhance.</p>
+                      </div>
+                    </div>
+                    <h2 id="where-to-begin"><a class="anchor" href="#where-to-begin"></a>Where to begin</h2>
+                    <div class="sectionbody">
+                    </div>
+                  </div>
+                </article>
+              </main>
+            </body>
+          </html>`),
+        src: {
+          component: 'hello',
+          version: '1.0',
+        },
+      },
+    ])
+    const index = generateIndex(playbook, contentCatalog)
+    const searchResultItems = index.index.search('begin')
+    expect(searchResultItems, 'Where to begin title must be found').to.have.lengthOf(1)
+    expect(searchResultItems[0].ref).to.equal('1-2')
+    expect(index.store['1'].url).to.equal('/hello/1.0/')
+    const sectionTitles = index.store['1'].titles
+    expect(sectionTitles).to.have.deep.members([
+      {
+        text: 'Manage docs as code',
+        hash: 'manage-docs-as-code',
+        id: 1,
+      },
+      {
+        text: 'Where to begin',
+        hash: 'where-to-begin',
+        id: 2,
+      },
+    ])
+    expect(sectionTitles.find((title) => title.id === 2).hash).to.equal('where-to-begin')
+  })
+
   describe('Paths', () => {
     it('should use relative links when site URL is not defined', () => {
       delete playbook.site.url
