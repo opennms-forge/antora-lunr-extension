@@ -21,11 +21,15 @@ describe('generateIndex()', () => {
   })
 
   it('should expose generateIndex as an exported function of main script', () => {
-    expect(require('@antora/lunr-extension').generateIndex).to.equal(generateIndex)
+    expect(require('@antora/lunr-extension').generateIndex).to.equal(
+      generateIndex
+    )
   })
 
   it('should expose generateIndex as an exported function via require path', () => {
-    expect(require('@antora/lunr-extension/generate-index')).to.equal(generateIndex)
+    expect(require('@antora/lunr-extension/generate-index')).to.equal(
+      generateIndex
+    )
   })
 
   it('should generate an empty index when there are no pages', () => {
@@ -53,13 +57,28 @@ describe('generateIndex()', () => {
     expect(installPage.text).to.equal('foo')
     expect(installPage.component).to.equal('component-a')
     expect(installPage.version).to.equal('2.0')
-    expect(index.index.search('foo'), 'foo is present in contents').to.have.lengthOf(1)
+    expect(
+      index.index.search('foo'),
+      'foo is present in contents'
+    ).to.have.lengthOf(1)
     expect(index.index.search('2.0'), '2.0 is not indexed').to.be.empty()
     expect(index.index.search('bar'), 'bar is not present').to.be.empty()
-    expect(index.index.search('install-foo'), 'install-foo is present in url').to.have.lengthOf(1)
-    expect(index.index.search('component-a'), 'component-a is present in component').to.have.lengthOf(1)
-    expect(index.index.search('*foo*'), '*foo* is present in contents').to.have.lengthOf(1)
-    expect(index.index.search('foo*'), 'foo* is present in contents').to.have.lengthOf(1)
+    expect(
+      index.index.search('install-foo'),
+      'install-foo is present in url'
+    ).to.have.lengthOf(1)
+    expect(
+      index.index.search('component-a'),
+      'component-a is present in component'
+    ).to.have.lengthOf(1)
+    expect(
+      index.index.search('*foo*'),
+      '*foo* is present in contents'
+    ).to.have.lengthOf(1)
+    expect(
+      index.index.search('foo*'),
+      'foo* is present in contents'
+    ).to.have.lengthOf(1)
   })
 
   it('should use provided logger to log info message that search index is being built with languages', () => {
@@ -74,7 +93,10 @@ describe('generateIndex()', () => {
       },
     ])
     const messages = []
-    const logger = configureLogger({ level: 'info', destination: { write: (message) => messages.push(message) } }).get()
+    const logger = configureLogger({
+      level: 'info',
+      destination: { write: (message) => messages.push(message) },
+    }).get()
     generateIndex(playbook, contentCatalog, { logger })
     expect(messages).to.not.be.empty()
     expect(JSON.parse(messages[0])).to.include({
@@ -102,7 +124,9 @@ describe('generateIndex()', () => {
       process.stdout.write = (message) => messages.push(message)
       generateIndex(playbook, contentCatalog)
       expect(messages).to.not.be.empty()
-      expect(messages[0]).to.equal('Building search index with the language(s): en\n')
+      expect(messages[0]).to.equal(
+        'Building search index with the language(s): en\n'
+      )
     } finally {
       if (nodeEnv) process.env.NODE_ENV = nodeEnv
       process.stdout.write = write
@@ -142,10 +166,22 @@ describe('generateIndex()', () => {
     expect(installPage.title).to.equal('Antora Documentation')
     expect(index.index.search('1.0'), 'version is not indexed').to.be.empty()
     expect(index.index.search('bar'), 'bar is not present').to.be.empty()
-    expect(index.index.search('where to begin'), '"Where to begin" is indexed as a title').to.have.lengthOf(1)
-    expect(index.index.search('docs as code'), '"docs as code" is indexed two times').to.have.lengthOf(2)
-    expect(index.index.search('technical'), '"technical" is indexed').to.have.lengthOf(1)
-    expect(index.index.search('hello'), '"hello" is indexed as component').to.have.lengthOf(1)
+    expect(
+      index.index.search('where to begin'),
+      '"Where to begin" is indexed as a title'
+    ).to.have.lengthOf(1)
+    expect(
+      index.index.search('docs as code'),
+      '"docs as code" is indexed two times'
+    ).to.have.lengthOf(2)
+    expect(
+      index.index.search('technical'),
+      '"technical" is indexed'
+    ).to.have.lengthOf(1)
+    expect(
+      index.index.search('hello'),
+      '"hello" is indexed as component'
+    ).to.have.lengthOf(1)
   })
 
   it('should not index navigation titles', () => {
@@ -219,7 +255,9 @@ describe('generateIndex()', () => {
     const index = generateIndex(playbook, contentCatalog)
     const installPage = index.store[1]
     expect(installPage.url).to.equal('/hello/1.0/')
-    expect(installPage.text).to.equal('The Static Site Generator for Tech Writers')
+    expect(installPage.text).to.equal(
+      'The Static Site Generator for Tech Writers'
+    )
   })
 
   it('should only index the first document title (heading 1)', () => {
@@ -492,7 +530,9 @@ describe('generateIndex()', () => {
       'contents',
       {
         get: function () {
-          expect.fail('should not request the contents on page that have noindex!')
+          expect.fail(
+            'should not request the contents on page that have noindex!'
+          )
         },
       }
     )
@@ -539,11 +579,15 @@ describe('generateIndex()', () => {
       'contents',
       {
         get: function () {
-          expect.fail('should not request the contents on page that is not in latest version!')
+          expect.fail(
+            'should not request the contents on page that is not in latest version!'
+          )
         },
       }
     )
-    const index = generateIndex(playbook, contentCatalog, { indexLatestOnly: true })
+    const index = generateIndex(playbook, contentCatalog, {
+      indexLatestOnly: true,
+    })
     expect(Object.keys(index.store)).to.have.lengthOf(1)
     expect(index.store).to.have.property('1')
     expect(index.store[1].url).to.equal('/hello/2.0/')
@@ -674,7 +718,10 @@ describe('generateIndex()', () => {
     ])
     const index = generateIndex(playbook, contentCatalog)
     const searchResultItems = index.index.search('begin')
-    expect(searchResultItems, 'Where to begin title must be found').to.have.lengthOf(1)
+    expect(
+      searchResultItems,
+      'Where to begin title must be found'
+    ).to.have.lengthOf(1)
     expect(searchResultItems[0].ref).to.equal('1-2')
     expect(index.store['1'].url).to.equal('/hello/1.0/')
     const sectionTitles = index.store['1'].titles
@@ -690,7 +737,9 @@ describe('generateIndex()', () => {
         id: 2,
       },
     ])
-    expect(sectionTitles.find((title) => title.id === 2).hash).to.equal('where-to-begin')
+    expect(sectionTitles.find((title) => title.id === 2).hash).to.equal(
+      'where-to-begin'
+    )
   })
 
   describe('Paths', () => {
@@ -822,19 +871,28 @@ describe('generateIndex()', () => {
       // but Lunr languages does not currently replace the accented letter "ê" by "e".
       // https://github.com/MihaiValentin/lunr-languages/issues/68
       // french
-      expect(idx.search('empêche').length, '"empêche" should match because the verb "empêcher" is present').to.equal(1)
+      expect(
+        idx.search('empêche').length,
+        '"empêche" should match because the verb "empêcher" is present'
+      ).to.equal(1)
       expect(
         idx.search('nouveaute').length,
         '"nouveaute" should match because the word `nouveautés` is present'
       ).to.equal(1)
       // make sure that missing words are not found
-      expect(idx.search('feature').length, '"feature" should not match because the word is absent').to.equal(0)
+      expect(
+        idx.search('feature').length,
+        '"feature" should not match because the word is absent'
+      ).to.equal(0)
       expect(
         idx.search('fonctionnalité').length,
         '"fonctionnalité" should not match because the word is absent'
       ).to.equal(0)
       // german (not enabled)
-      expect(idx.search('heiße').length, '"heiße" should match because the word `heiße` is present').to.equal(1)
+      expect(
+        idx.search('heiße').length,
+        '"heiße" should match because the word `heiße` is present'
+      ).to.equal(1)
       expect(
         idx.search('heisse').length,
         '"heisse" should not match because the word `heisse` is absent and the German stemmer is not enabled'
@@ -861,19 +919,28 @@ describe('generateIndex()', () => {
 
       const idx = lunr.Index.load(index.index.toJSON())
       // french
-      expect(idx.search('empêche').length, '"empêche" should match because the verb "empêcher" is present').to.equal(1)
+      expect(
+        idx.search('empêche').length,
+        '"empêche" should match because the verb "empêcher" is present'
+      ).to.equal(1)
       expect(
         idx.search('nouveaute').length,
         '"nouveaute" should match because the word `nouveautés` is present'
       ).to.equal(1)
       // make sure that missing words are not found
-      expect(idx.search('feature').length, '"feature" should not match because the word is absent').to.equal(0)
+      expect(
+        idx.search('feature').length,
+        '"feature" should not match because the word is absent'
+      ).to.equal(0)
       expect(
         idx.search('fonctionnalité').length,
         '"fonctionnalité" should not match because the word is absent'
       ).to.equal(0)
       // german
-      expect(idx.search('heiße').length, '"heiße" should match because the word `heiße` is present').to.equal(1)
+      expect(
+        idx.search('heiße').length,
+        '"heiße" should match because the word `heiße` is present'
+      ).to.equal(1)
       expect(
         idx.search('heisse').length,
         '"heisse" should match because the word `heiße` is present and the German stemmer is enabled'

@@ -67,11 +67,18 @@
   background-color: rgba(69, 142, 225, 0.05);
 }
 
-.search-result-highlight {
+.search-result-document-hit .search-result-highlight {
   color: #174d8c;
   background: rgba(143, 187, 237, 0.1);
   padding: 0.1em 0.05em;
   font-weight: 500;
+}
+
+.search-result-document-hit .search-result-section-title {
+  color: #303030;
+  font-weight: 500;
+  font-size: 1.05em;
+  margin-bottom: 0.25em;
 }
 
 #search-input {

@@ -1,16 +1,16 @@
 /* global CustomEvent, globalThis */
 'use strict'
 
-import { highlightHit } from './search-result-highlighting.mjs'
+import { buildHighlightedText, findTermPosition } from './search-result-highlighting.mjs'
 
 const config = document.getElementById('search-ui-script').dataset
 const snippetLength = parseInt(config.snippetLength || 100, 10)
 const siteRootPath = config.siteRootPath || ''
 appendStylesheet(config.stylesheet)
 const searchInput = document.getElementById('search-input')
-const searchResult = document.createElement('div')
-searchResult.classList.add('search-result-dropdown-menu')
-searchInput.parentNode.appendChild(searchResult)
+const searchResultContainer = document.createElement('div')
+searchResultContainer.classList.add('search-result-dropdown-menu')
+searchInput.parentNode.appendChild(searchResultContainer)
 const facetFilterInput = document.querySelector('#search-field input[type=checkbox][data-facet-filter]')
 
 function appendStylesheet (href) {
@@ -19,6 +19,53 @@ function appendStylesheet (href) {
   link.rel = 'stylesheet'
   link.href = href
   document.head.appendChild(link)
+}
+
+function highlightPageTitle (title, terms) {
+  const positions = getTermPosition(title, terms)
+  return buildHighlightedText(title, positions, snippetLength)
+}
+
+function highlightSectionTitle (sectionTitle, terms) {
+  if (sectionTitle) {
+    const text = sectionTitle.text
+    const positions = getTermPosition(text, terms)
+    return buildHighlightedText(text, positions, snippetLength)
+  }
+  return []
+}
+
+function highlightText (doc, terms) {
+  const text = doc.text
+  const positions = getTermPosition(text, terms)
+  return buildHighlightedText(text, positions, snippetLength)
+}
+
+function getTermPosition (text, terms) {
+  const positions = terms
+    .map((term) => findTermPosition(globalThis.lunr, term, text))
+    .filter((position) => position.length > 0)
+    .sort((p1, p2) => p1.start - p2.start)
+
+  if (positions.length === 0) {
+    return []
+  }
+  return positions
+}
+
+function highlightHit (searchMetadata, sectionTitle, doc) {
+  const terms = {}
+  for (const term in searchMetadata) {
+    const fields = searchMetadata[term]
+    for (const field in fields) {
+      terms[field] = [...(terms[field] || []), term]
+    }
+  }
+  return {
+    pageTitleNodes: highlightPageTitle(doc.title, terms.title || []),
+    sectionTitleNodes: highlightSectionTitle(sectionTitle, terms.title || []),
+    pageContentNodes: highlightText(doc, terms.text || []),
+  }
 }
 
 function createSearchResult (result, store, searchResultDataset) {
@@ -34,21 +81,47 @@ function createSearchResult (result, store, searchResultDataset) {
       })[0]
     }
     const metadata = item.matchData.metadata
-    const nodes = highlightHit(metadata, sectionTitle, doc, snippetLength)
-    searchResultDataset.appendChild(createSearchResultItem(doc, sectionTitle, item, nodes))
+    const highlightingResult = highlightHit(metadata, sectionTitle, doc)
+    searchResultDataset.appendChild(createSearchResultItem(doc, sectionTitle, item, highlightingResult))
   })
 }
 
-function createSearchResultItem (doc, sectionTitle, item, nodes) {
+function createSearchResultItem (doc, sectionTitle, item, highlightingResult) {
   const documentTitle = document.createElement('div')
   documentTitle.classList.add('search-result-document-title')
-  documentTitle.innerText = doc.title
+  highlightingResult.pageTitleNodes.forEach(function (node) {
+    let element
+    if (node.type === 'text') {
+      element = document.createTextNode(node.text)
+    } else {
+      element = document.createElement('span')
+      element.classList.add('search-result-highlight')
+      element.innerText = node.text
+    }
+    documentTitle.appendChild(element)
+  })
   const documentHit = document.createElement('div')
   documentHit.classList.add('search-result-document-hit')
   const documentHitLink = document.createElement('a')
   documentHitLink.href = siteRootPath + doc.url + (sectionTitle ? '#' + sectionTitle.hash : '')
   documentHit.appendChild(documentHitLink)
-  nodes.forEach(function (node) {
+  if (highlightingResult.sectionTitleNodes.length > 0) {
+    const documentSectionTitle = document.createElement('div')
+    documentSectionTitle.classList.add('search-result-section-title')
+    documentHitLink.appendChild(documentSectionTitle)
+    highlightingResult.sectionTitleNodes.forEach(function (node) {
+      let element
+      if (node.type === 'text') {
+        element = document.createTextNode(node.text)
+      } else {
+        element = document.createElement('span')
+        element.classList.add('search-result-highlight')
+        element.innerText = node.text
+      }
+      documentSectionTitle.appendChild(element)
+    })
+  }
+  highlightingResult.pageContentNodes.forEach(function (node) {
     let element
     if (node.type === 'text') {
       element = document.createTextNode(node.text)
@@ -83,7 +156,7 @@ function createNoResult (text) {
 
 function clearSearchResults (reset) {
   if (reset === true) searchInput.value = ''
-  searchResult.innerHTML = ''
+  searchResultContainer.innerHTML = ''
 }
 
 function filter (result, store) {
@@ -156,7 +229,7 @@ function searchIndex (index, store, text) {
   const result = search(index, store, text)
   const searchResultDataset = document.createElement('div')
   searchResultDataset.classList.add('search-result-dataset')
-  searchResult.appendChild(searchResultDataset)
+  searchResultContainer.appendChild(searchResultDataset)
   if (result.length > 0) {
     createSearchResult(result, store, searchResultDataset)
   } else {
@@ -190,7 +263,7 @@ function enableSearchInput (enabled) {
 }
 
 function isClosed () {
-  return searchResult.childElementCount === 0
+  return searchResultContainer.childElementCount === 0
 }
 
 function executeSearch (index) {
@@ -200,7 +273,13 @@ function executeSearch (index) {
     if (!query) return clearSearchResults()
     searchIndex(index.index, index.store, query)
   } catch (err) {
-    if (debug) console.debug('Invalid search query: ' + query + ' (' + err.message + ')')
+    if (err instanceof globalThis.lunr.QueryParseError) {
+      if (debug) {
+        console.debug('Invalid search query: ' + query + ' (' + err.message + ')')
+      }
+    } else {
+      console.error('Something went wrong while searching', err)
+    }
   }
 }
 
@@ -230,7 +309,7 @@ export function initSearch (lunr, data) {
     }, 100)
   )
   searchInput.addEventListener('click', confineEvent)
-  searchResult.addEventListener('click', confineEvent)
+  searchResultContainer.addEventListener('click', confineEvent)
   if (facetFilterInput) {
     facetFilterInput.parentElement.addEventListener('click', confineEvent)
     facetFilterInput.addEventListener('change', (e) => toggleFilter(e, index))

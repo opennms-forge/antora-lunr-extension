@@ -1,6 +1,6 @@
-= The Page
+= Page Title
 
-This is the content of the page.
+This is the content.
 
 == Section Title
 
