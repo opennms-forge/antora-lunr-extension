@@ -68,6 +68,17 @@ describe('generateSite()', () => {
     expect($('script[src="../../_/js/vendor/lunr.js"]').get()).to.have.lengthOf(1)
   })
 
+  it('should output vendored JS files to multiple destinations', async () => {
+    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-destinations.yml')
+    await generateSite(['--playbook', playbookFile, '--cache-dir', cacheDir, '--quiet'], {})
+    const expectedA = ospath.join(outputDir, 'a', '_/js/vendor/lunr.js')
+    expect(expectedA).to.be.a.file().and.not.empty()
+    expect(expectedA).to.be.a.file().and.equal(require.resolve('lunr/lunr.min.js'))
+    const expectedB = ospath.join(outputDir, 'b', '_/js/vendor/lunr.js')
+    expect(expectedB).to.be.a.file().and.not.empty()
+    expect(expectedB).to.be.a.file().and.equal(require.resolve('lunr/lunr.min.js'))
+  })
+
   it('should output language support files to js vendor directory of UI output folder', async () => {
     playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-languages.yml')
     const env = {}
