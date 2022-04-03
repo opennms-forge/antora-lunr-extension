@@ -22,7 +22,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 
 === Fixed
 
-* Correct detect custom search-scripts.hbs partial (#32)
+* Correctly detect custom search-scripts.hbs partial (#32)
 
 == 1.0.0-alpha.3 (2022-01-17)
 
