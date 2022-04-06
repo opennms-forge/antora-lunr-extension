@@ -213,7 +213,7 @@
 
   function initSearch (lunr, data) {
     var start = performance.now()
-    var index = Object.assign({ index: lunr.Index.load(data.index), store: data.store })
+    var index = { index: lunr.Index.load(data.index), store: data.store }
     enableSearchInput(true)
     searchInput.dispatchEvent(
       new CustomEvent('loadedindex', {
