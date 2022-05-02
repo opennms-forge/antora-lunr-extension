@@ -6,6 +6,10 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 
 == Unreleased
 
+=== Added
+
+* Automatically add the search-ui.js and search.css files (if they don't exist) and remove dependency on supplemental UI (#15)
+
 === Fixed
 
 * Create stream for vendored JS file on demand to support multiple destinations (#44)

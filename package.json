@@ -26,8 +26,9 @@
     "node": ">=16.0.0"
   },
   "scripts": {
+    "pretest": "npm run build",
     "build": "npx rollup -c rollup.config.js",
-    "coverage": "nyc _mocha test",
+    "coverage": "nyc npm t",
     "format": "node npm/format.js lib,test,npm,supplemental_ui",
     "lint": "eslint lib test npm data --ext js,mjs",
     "test": "_mocha test",

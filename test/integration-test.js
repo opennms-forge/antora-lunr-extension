@@ -14,14 +14,15 @@ const generateSite = require('@antora/site-generator')
 describe('generateSite()', () => {
   const cacheDir = ospath.join(WORK_DIR, '.cache/antora')
   const outputDir = ospath.join(WORK_DIR, 'public')
-  let playbookFile = ospath.join(FIXTURES_DIR, 'docs-site/antora-playbook.yml')
+  const defaultPlaybookFile = ospath.join(FIXTURES_DIR, 'docs-site/antora-playbook.yml')
+  const playbookFileWithCustomSupplementalUi = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-custom-supplemental-ui.yml')
 
   beforeEach(() => fsp.rm(outputDir, { recursive: true, force: true }))
   after(() => fsp.rm(WORK_DIR, { recursive: true, force: true }))
 
   it('should generate a site with a search index', async () => {
     const env = {}
-    await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], env)
+    await generateSite(['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], env)
     expect(env).to.not.have.property('SITE_SEARCH_PROVIDER')
     const searchIndexPath = ospath.join(outputDir, 'search-index.js')
     expect(searchIndexPath).to.be.a.file()
@@ -29,14 +30,19 @@ describe('generateSite()', () => {
     global.antoraSearch = {}
     global.antoraSearch.initSearch = function (lunr, index) {
       expect(Object.keys(index.store).length).to.equal(2)
-      expect(index.store[1]).to.include({
-        title: 'Antora x Lunr',
-        url: '/antora-lunr/index.html',
-      })
-      expect(index.store[2]).to.include({
-        title: 'The Page',
-        url: '/antora-lunr/named-module/the-page.html',
-      })
+      expect(Object
+        .entries(index.store)
+        .map(([key, value]) => ({ title: value.title, url: value.url }))
+      ).to.deep.include.members([
+        {
+          title: 'Antora x Lunr',
+          url: '/antora-lunr/index.html',
+        },
+        {
+          title: 'The Page',
+          url: '/antora-lunr/named-module/the-page.html',
+        },
+      ])
     }
     require(searchIndexPath)
     delete global.lunr
@@ -44,7 +50,7 @@ describe('generateSite()', () => {
   })
 
   it('should insert script element with predefined data attributes', async () => {
-    await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    await generateSite(['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
     const startPageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr/index.html'))
     let $ = cheerio.load(startPageContents)
     expect($('#search-input')).to.have.lengthOf(1)
@@ -61,7 +67,7 @@ describe('generateSite()', () => {
   })
 
   it('should output lunr.js client/engine to js vendor directory of UI output folder', async () => {
-    await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    await generateSite(['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
     const expected = ospath.join(outputDir, '_/js/vendor/lunr.js')
     expect(expected).to.be.a.file().and.equal(require.resolve('lunr/lunr.min.js'))
     const thePageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr/named-module/the-page.html'))
@@ -70,7 +76,7 @@ describe('generateSite()', () => {
   })
 
   it('should output vendored JS files to multiple destinations', async () => {
-    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-destinations.yml')
+    const playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-destinations.yml')
     await generateSite(['--playbook', playbookFile, '--cache-dir', cacheDir, '--quiet'], {})
     const expectedA = ospath.join(outputDir, 'a', '_/js/vendor/lunr.js')
     expect(expectedA).to.be.a.file().and.not.empty()
@@ -81,7 +87,7 @@ describe('generateSite()', () => {
   })
 
   it('should output language support files to js vendor directory of UI output folder', async () => {
-    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-languages.yml')
+    const playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-languages.yml')
     const env = {}
     await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], env)
     expect(env).to.not.have.property('SITE_SEARCH_LANGUAGES')
@@ -101,7 +107,7 @@ describe('generateSite()', () => {
   })
 
   it('should output language support files[ja] to js vendor directory of UI output folder', async () => {
-    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-languages-ja.yml')
+    const playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-languages-ja.yml')
     const env = {}
     await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], env)
     expect(env).to.not.have.property('SITE_SEARCH_LANGUAGES')
@@ -122,7 +128,7 @@ describe('generateSite()', () => {
   })
 
   it('should output language support files[th] to js vendor directory of UI output folder', async () => {
-    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-languages-th.yml')
+    const playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-languages-th.yml')
     const env = {}
     await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], env)
     expect(env).to.not.have.property('SITE_SEARCH_LANGUAGES')
@@ -143,7 +149,7 @@ describe('generateSite()', () => {
   })
 
   it('should allow extension to configure snippet length', async () => {
-    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-snippet-length.yml')
+    const playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-snippet-length.yml')
     await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
     const startPageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr/index.html'))
     const searchScript = cheerio.load(startPageContents)('#search-ui-script')
@@ -151,8 +157,7 @@ describe('generateSite()', () => {
   })
 
   it('should use existing search-scripts.hbs partial if present in UI', async () => {
-    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-custom-supplemental-ui.yml')
-    await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    await generateSite(['--playbook', playbookFileWithCustomSupplementalUi, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
     const startPageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr/index.html'))
     const searchScript = cheerio.load(startPageContents)('#search-ui-script')
     expect(searchScript).to.have.lengthOf(1)
@@ -161,7 +166,7 @@ describe('generateSite()', () => {
   })
 
   it('should not generate search index or add scripts to pages if extension is not enabled', async () => {
-    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-without-extension.yml')
+    const playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-without-extension.yml')
     const env = {}
     await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], env)
     expect(env).to.not.have.property('SITE_SEARCH_PROVIDER')
@@ -173,7 +178,7 @@ describe('generateSite()', () => {
   })
 
   it('should throw error if unknown options are specified in playbook', async () => {
-    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-unknown-options.yml')
+    const playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-unknown-options.yml')
     const expectedMessage = 'Unrecognized options specified for @antora/lunr-extension: foo, yin'
     expect(
       await generateSite(['--playbook', playbookFile], {}).then(
@@ -183,5 +188,29 @@ describe('generateSite()', () => {
         }
       )
     ).to.throw(expectedMessage)
+  })
+
+  it('should output search.css to css directory of UI output folder', async () => {
+    await generateSite(['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    const expected = ospath.join(outputDir, '_/css/search.css')
+    expect(expected).to.be.a.file().and.equal(ospath.join(__dirname, '..', 'data', 'css', 'search.css'))
+  })
+
+  it('should output search-ui.js to js directory of UI output folder', async () => {
+    await generateSite(['--playbook', defaultPlaybookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    const expected = ospath.join(outputDir, '_/js/search-ui.js')
+    expect(expected).to.be.a.file().and.equal(ospath.join(__dirname, '..', 'data', 'js', 'search-ui.js'))
+  })
+
+  it('should preserve existing search.css', async () => {
+    await generateSite(['--playbook', playbookFileWithCustomSupplementalUi, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    const expected = ospath.join(outputDir, '_/css/search.css')
+    expect(expected).to.be.a.file().and.equal(ospath.join(__dirname, 'fixtures', 'docs-site', 'custom-supplemental-ui', 'css', 'search.css'))
+  })
+
+  it('should preserve existing search-ui.js', async () => {
+    await generateSite(['--playbook', playbookFileWithCustomSupplementalUi, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
+    const expected = ospath.join(outputDir, '_/js/search-ui.js')
+    expect(expected).to.be.a.file().and.equal(ospath.join(__dirname, 'fixtures', 'docs-site', 'custom-supplemental-ui', 'js', 'search-ui.js'))
   })
 })

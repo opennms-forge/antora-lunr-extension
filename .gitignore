@@ -2,6 +2,7 @@
 /coverage-report/
 /node_modules/
 /test-report/
+/test/work/
 /reports/
 # generated
-/supplemental_ui/js/search-ui.js
+/data/js/search-ui.js
