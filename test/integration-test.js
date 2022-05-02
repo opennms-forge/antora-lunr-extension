@@ -26,7 +26,8 @@ describe('generateSite()', () => {
     const searchIndexPath = ospath.join(outputDir, 'search-index.js')
     expect(searchIndexPath).to.be.a.file()
     global.lunr = {}
-    global.initSearch = function (lunr, index) {
+    global.antoraSearch = {}
+    global.antoraSearch.initSearch = function (lunr, index) {
       expect(Object.keys(index.store).length).to.equal(2)
       expect(index.store[1]).to.include({
         title: 'Antora x Lunr',
@@ -39,7 +40,7 @@ describe('generateSite()', () => {
     }
     require(searchIndexPath)
     delete global.lunr
-    delete global.initSearch
+    delete global.antoraSearch
   })
 
   it('should insert script element with predefined data attributes', async () => {

@@ -41,7 +41,9 @@ default:
     paths:
     - *npm_cache_dir
     policy: pull
-  script: npm test
+  script:
+  - npm run build
+  - npm test
 # this job also seeds the dependency cache
 lint:
   extends: .npm
