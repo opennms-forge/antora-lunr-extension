@@ -1,9 +1,9 @@
-/* global CustomEvent */
+/* global CustomEvent, globalThis */
 'use strict'
 
 import { highlightHit } from './search-result-highlighting.mjs'
 
-const config = document.getElementById('search-script').dataset
+const config = document.getElementById('search-ui-script').dataset
 const snippetLength = parseInt(config.snippetLength || 100, 10)
 const siteRootPath = config.siteRootPath || ''
 appendStylesheet(config.stylesheet)
@@ -11,6 +11,7 @@ const searchInput = document.getElementById('search-input')
 const searchResult = document.createElement('div')
 searchResult.classList.add('search-result-dropdown-menu')
 searchInput.parentNode.appendChild(searchResult)
+const facetFilterInput = document.querySelector('#search-field input[type=checkbox][data-facet-filter]')
 
 function appendStylesheet (href) {
   if (!href) return
@@ -85,19 +86,65 @@ function clearSearchResults (reset) {
   searchResult.innerHTML = ''
 }
 
-function search (index, text) {
+function filter (result, store) {
+  const facetFilter = facetFilterInput && facetFilterInput.checked && facetFilterInput.dataset.facetFilter
+  if (facetFilter) {
+    const [field, value] = facetFilter.split(':')
+    return result.filter((item) => {
+      const ids = item.ref.split('-')
+      const docId = ids[0]
+      const doc = store[docId]
+      return field in doc && doc[field] === value
+    })
+  }
+  return result
+}
+
+function search (index, store, queryString) {
   // execute an exact match search
-  let result = index.search(text)
+  let query
+  let result = filter(
+    index.query(function (lunrQuery) {
+      const parser = new globalThis.lunr.QueryParser(queryString, lunrQuery)
+      parser.parse()
+      query = lunrQuery
+    }),
+    store
+  )
   if (result.length > 0) {
     return result
   }
   // no result, use a begins with search
-  result = index.search(text + '*')
+  result = filter(
+    index.query(function (lunrQuery) {
+      lunrQuery.clauses = query.clauses.map((clause) => {
+        if (clause.presence !== globalThis.lunr.Query.presence.PROHIBITED) {
+          clause.term = clause.term + '*'
+          clause.wildcard = globalThis.lunr.Query.wildcard.TRAILING
+          clause.usePipeline = false
+        }
+        return clause
+      })
+    }),
+    store
+  )
   if (result.length > 0) {
     return result
   }
   // no result, use a contains search
-  result = index.search('*' + text + '*')
+  result = filter(
+    index.query(function (lunrQuery) {
+      lunrQuery.clauses = query.clauses.map((clause) => {
+        if (clause.presence !== globalThis.lunr.Query.presence.PROHIBITED) {
+          clause.term = '*' + clause.term + '*'
+          clause.wildcard = globalThis.lunr.Query.wildcard.LEADING | globalThis.lunr.Query.wildcard.TRAILING
+          clause.usePipeline = false
+        }
+        return clause
+      })
+    }),
+    store
+  )
   return result
 }
 
@@ -106,7 +153,7 @@ function searchIndex (index, store, text) {
   if (text.trim() === '') {
     return
   }
-  const result = search(index, text)
+  const result = search(index, store, text)
   const searchResultDataset = document.createElement('div')
   searchResultDataset.classList.add('search-result-dataset')
   searchResult.appendChild(searchResultDataset)
@@ -142,6 +189,28 @@ function enableSearchInput (enabled) {
   searchInput.title = enabled ? '' : 'Loading index...'
 }
 
+function isClosed () {
+  return searchResult.childElementCount === 0
+}
+
+function executeSearch (index) {
+  const debug = 'URLSearchParams' in globalThis && new URLSearchParams(globalThis.location.search).has('lunr-debug')
+  const query = searchInput.value
+  try {
+    if (!query) return clearSearchResults()
+    searchIndex(index.index, index.store, query)
+  } catch (err) {
+    if (debug) console.debug('Invalid search query: ' + query + ' (' + err.message + ')')
+  }
+}
+
+function toggleFilter (e, index) {
+  searchInput.focus()
+  if (!isClosed()) {
+    executeSearch(index)
+  }
+}
+
 export function initSearch (lunr, data) {
   const start = performance.now()
   const index = { index: lunr.Index.load(data.index), store: data.store }
@@ -153,22 +222,19 @@ export function initSearch (lunr, data) {
       },
     })
   )
-  const debug = 'URLSearchParams' in globalThis && new URLSearchParams(globalThis.location.search).has('lunr-debug')
   searchInput.addEventListener(
     'keydown',
     debounce(function (e) {
       if (e.key === 'Escape' || e.key === 'Esc') return clearSearchResults(true)
-      const query = searchInput.value
-      try {
-        if (!query) return clearSearchResults()
-        searchIndex(index.index, index.store, searchInput.value)
-      } catch (err) {
-        if (debug) console.debug('Invalid search query: ' + query + ' (' + err.message + ')')
-      }
+      executeSearch(index)
     }, 100)
   )
   searchInput.addEventListener('click', confineEvent)
   searchResult.addEventListener('click', confineEvent)
+  if (facetFilterInput) {
+    facetFilterInput.parentElement.addEventListener('click', confineEvent)
+    facetFilterInput.addEventListener('change', (e) => toggleFilter(e, index))
+  }
   document.documentElement.addEventListener('click', clearSearchResults)
 }
 

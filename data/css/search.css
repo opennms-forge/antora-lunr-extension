@@ -73,3 +73,35 @@
   padding: 0.1em 0.05em;
   font-weight: 500;
 }
+
+#search-input {
+  padding: 0.25em;
+}
+
+#search-input:focus {
+  outline: none;
+}
+
+#search-field {
+  display: flex;
+}
+
+#search-field .filter {
+  background: #fff linear-gradient(180deg,#e1e1e1 0,#e1e1e1) no-repeat 0/1px 50%;
+  border: 1px solid #e1e1e1;
+  border-left: none;
+  border-radius: 0 0.1em 0.1em 0;
+  color: #5d5d5d;
+  cursor: pointer;
+  font-size: .875em;
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+#search-field.has-filter > input {
+  border-right: none;
+  border-radius: 0.1em 0 0 0.1em;
+}
