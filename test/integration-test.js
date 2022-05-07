@@ -99,6 +99,48 @@ describe('generateSite()', () => {
     expect($('script[src="../../_/js/vendor/lunr.fr.js"]').get()).to.have.lengthOf(0)
   })
 
+  it('should output language support files[ja] to js vendor directory of UI output folder', async () => {
+    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-languages-ja.yml')
+    const env = {}
+    await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], env)
+    expect(env).to.not.have.property('SITE_SEARCH_LANGUAGES')
+    const expectedContents = await Promise.all([
+      fsp.readFile(require.resolve('lunr-languages/lunr.stemmer.support.js')),
+      fsp.readFile(require.resolve('lunr-languages/tinyseg.js')),
+      fsp.readFile(require.resolve('lunr-languages/lunr.ja.js')),
+    ]).then(Buffer.concat)
+    expect(ospath.join(outputDir, '_/js/vendor/lunr-languages.js'))
+      .to.be.a.file()
+      .and.have.content(expectedContents.toString())
+    const thePageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr/named-module/the-page.html'))
+    const $ = cheerio.load(thePageContents)
+    expect($('script[src="../../_/js/vendor/lunr.stemmer.support.js"]').get()).to.have.lengthOf(0)
+    expect($('script[src="../../_/js/vendor/lunr-languages.js"]').get()).to.have.lengthOf(1)
+    expect($('script[src="../../_/js/vendor/tinyseg.js"]').get()).to.have.lengthOf(0)
+    expect($('script[src="../../_/js/vendor/lunr.ja.js"]').get()).to.have.lengthOf(0)
+  })
+
+  it('should output language support files[th] to js vendor directory of UI output folder', async () => {
+    playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-languages-th.yml')
+    const env = {}
+    await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], env)
+    expect(env).to.not.have.property('SITE_SEARCH_LANGUAGES')
+    const expectedContents = await Promise.all([
+      fsp.readFile(require.resolve('lunr-languages/lunr.stemmer.support.js')),
+      fsp.readFile(require.resolve('lunr-languages/wordcut.js')),
+      fsp.readFile(require.resolve('lunr-languages/lunr.th.js')),
+    ]).then(Buffer.concat)
+    expect(ospath.join(outputDir, '_/js/vendor/lunr-languages.js'))
+      .to.be.a.file()
+      .and.have.content(expectedContents.toString())
+    const thePageContents = await fsp.readFile(ospath.join(outputDir, 'antora-lunr/named-module/the-page.html'))
+    const $ = cheerio.load(thePageContents)
+    expect($('script[src="../../_/js/vendor/lunr-languages.js"]').get()).to.have.lengthOf(1)
+    expect($('script[src="../../_/js/vendor/lunr.stemmer.support.js"]').get()).to.have.lengthOf(0)
+    expect($('script[src="../../_/js/vendor/wordcut.js"]').get()).to.have.lengthOf(0)
+    expect($('script[src="../../_/js/vendor/lunr.th.js"]').get()).to.have.lengthOf(0)
+  })
+
   it('should allow extension to configure snippet length', async () => {
     playbookFile = ospath.join(FIXTURES_DIR, 'docs-site', 'antora-playbook-with-snippet-length.yml')
     await generateSite(['--playbook', playbookFile, '--to-dir', outputDir, '--cache-dir', cacheDir, '--quiet'], {})
