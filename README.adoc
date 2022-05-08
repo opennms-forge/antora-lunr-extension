@@ -512,5 +512,6 @@ Here's a list of projects using the Antora Lunr extension.
 * https://source.whitehatsec.com/help/sentinel/[NTT Application Security]
 * https://hub.syn.tools/hub/[Commodore Components Hub (VSHN)]
 * https://datahandwerk.gitlab.io/[DHW - DataHandwerk toolkit mssql]
+* https://solr.apache.org/guide/solr/9_0/[Apache Solr Reference Guide]
 
 To add your project to this list, please {url-repo}/-/edit/main/README.adoc[edit this file]!
