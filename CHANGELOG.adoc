@@ -6,13 +6,19 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 
 == Unreleased
 
-=== Added
-
-* Automatically add the search-ui.js and search.css files (if they don't exist) and remove dependency on supplemental UI (#15)
-
 === Fixed
 
 * Create stream for vendored JS file on demand to support multiple destinations (#44)
+* Automatically add `tinyseg.js` (needed for Japanese support) and `wordcut.js` (needed for Thai spport)
+
+=== Changed
+
+* Automatically add `search-ui.js` and `search.css` files (if they don't exist) and remove dependency on supplemental UI (#15)
+
+=== Added
+
+* Allow to restrict search to current component (#4)
+* Add Apache Solr to the "Who's using it?" section
 
 == 1.0.0-alpha.6 (2022-03-15)
 
