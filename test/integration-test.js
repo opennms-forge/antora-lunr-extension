@@ -47,9 +47,9 @@ describe('generateSite()', () => {
     global.lunr = {}
     global.antoraSearch = {}
     global.antoraSearch.initSearch = function (lunr, index) {
-      expect(Object.keys(index.store).length).to.equal(2)
+      expect(Object.keys(index.store.documents).length).to.equal(2)
       expect(
-        Object.entries(index.store).map(([key, value]) => ({
+        Object.entries(index.store.documents).map(([key, value]) => ({
           title: value.title,
           url: value.url,
         }))

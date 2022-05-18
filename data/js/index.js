@@ -69,10 +69,11 @@ function highlightHit (searchMetadata, sectionTitle, doc) {
 }
 
 function createSearchResult (result, store, searchResultDataset) {
+  let currentComponent
   result.forEach(function (item) {
     const ids = item.ref.split('-')
     const docId = ids[0]
-    const doc = store[docId]
+    const doc = store.documents[docId]
     let sectionTitle
     if (ids.length > 1) {
       const titleId = ids[1]
@@ -82,6 +83,16 @@ function createSearchResult (result, store, searchResultDataset) {
     }
     const metadata = item.matchData.metadata
     const highlightingResult = highlightHit(metadata, sectionTitle, doc)
+    const componentVersion = store.componentVersions[`${doc.component}/${doc.version}`]
+    if (componentVersion !== undefined && currentComponent !== componentVersion) {
+      const searchResultComponentHeader = document.createElement('div')
+      searchResultComponentHeader.classList.add('search-result-component-header')
+      const { title, displayVersion } = componentVersion
+      const componentVersionText = `${title}${doc.version && displayVersion ? ` ${displayVersion}` : ''}`
+      searchResultComponentHeader.appendChild(document.createTextNode(componentVersionText))
+      searchResultDataset.appendChild(searchResultComponentHeader)
+      currentComponent = componentVersion
+    }
     searchResultDataset.appendChild(createSearchResultItem(doc, sectionTitle, item, highlightingResult))
   })
 }
@@ -159,21 +170,21 @@ function clearSearchResults (reset) {
   searchResultContainer.innerHTML = ''
 }
 
-function filter (result, store) {
+function filter (result, documents) {
   const facetFilter = facetFilterInput && facetFilterInput.checked && facetFilterInput.dataset.facetFilter
   if (facetFilter) {
     const [field, value] = facetFilter.split(':')
     return result.filter((item) => {
       const ids = item.ref.split('-')
       const docId = ids[0]
-      const doc = store[docId]
+      const doc = documents[docId]
       return field in doc && doc[field] === value
     })
   }
   return result
 }
 
-function search (index, store, queryString) {
+function search (index, documents, queryString) {
   // execute an exact match search
   let query
   let result = filter(
@@ -182,7 +193,7 @@ function search (index, store, queryString) {
       parser.parse()
       query = lunrQuery
     }),
-    store
+    documents
   )
   if (result.length > 0) {
     return result
@@ -199,7 +210,7 @@ function search (index, store, queryString) {
         return clause
       })
     }),
-    store
+    documents
   )
   if (result.length > 0) {
     return result
@@ -216,7 +227,7 @@ function search (index, store, queryString) {
         return clause
       })
     }),
-    store
+    documents
   )
   return result
 }
@@ -226,7 +237,7 @@ function searchIndex (index, store, text) {
   if (text.trim() === '') {
     return
   }
-  const result = search(index, store, text)
+  const result = search(index, store.documents, text)
   const searchResultDataset = document.createElement('div')
   searchResultDataset.classList.add('search-result-dataset')
   searchResultContainer.appendChild(searchResultDataset)
