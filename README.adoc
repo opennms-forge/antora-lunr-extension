@@ -425,6 +425,25 @@ You can use the following snippet if you want to add a checkbox in order to rest
 {{/if}}
 ----
 
+If you want to filter on the current component by default, you can add the `checked` attribute on the checkbox:
+
+[,hbs]
+----
+<input type="checkbox" data-facet-filter="component:{{page.component.name}}" checked> In this project
+----
+
+If you always want to filter on the current component (without giving an option), you can hide the checkbox using an inline style:
+
+[,hbs]
+----
+<label class="filter checkbox" style="display: none">
+  <input type="checkbox" data-facet-filter="component:{{page.component.name}}" checked> In this project
+</label>
+----
+
+
+Same as above and in addition hide the input box using CSS (or inline style).
+
 === Search scripts
 
 This extension assumes that the UI will include the _search-scripts_ partial somewhere in the footer.
