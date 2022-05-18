@@ -440,6 +440,7 @@ If you always want to filter on the current component (without giving an option)
   <input type="checkbox" data-facet-filter="component:{{page.component.name}}" checked> In this project
 </label>
 ----
+
 === Search scripts
 
 This extension assumes that the UI will include the _search-scripts_ partial somewhere in the footer.
