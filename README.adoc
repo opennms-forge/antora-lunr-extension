@@ -50,12 +50,7 @@ We strongly recommend installing dependencies into your playbook project.
 This strategy makes it easier to manage the dependencies, clearly documents those dependencies, and ensures the build is portable and isolated from other sites.
 
 Both of the previous two commands download and install the latest release of this software from the npm registry.
-If you want to use the development version, you can replace the name of the package with the URL of the git repository.
-
-[,console,subs=+attributes]
-----
-$ npm i {url-repo}
-----
+If you want to use the development version, please refer to the <<contributing, contributing section>>.
 
 Although the software in the git repository is regularly and rigorously tested, the behavior of the development version may not always match the documentation.
 
@@ -464,45 +459,18 @@ This extension will automatically add the stylesheet _search.css_ to the UI cata
 
 If a custom UI depends on additional styles, the creator of the UI can either bundle those styles or ask the user to place an alternate stylesheet in the supplemental UI.
 
-== Run tests
+[#contributing]
+== Contributing
 
-This project is built using Node.js.
-In order to run the tests, you need Node.js and the development dependencies for the project.
+If you are interested in contributing to this project, please refer to the <<contributing.adoc#,contributing guide>>.
+In this guide, you'll learn how to:
 
-First, make sure you have at least Node.js installed.
+* <<contributing.adoc#set-up-workspace,set up your development workspace>>
+* <<contributing.adoc#build-project,build the project>>
+* <<contributing.adoc#run-dev-version,run the development version>>
+* <<contributing.adoc#project-rq,submit a merge request>>
 
-[,console]
-----
-$ node -v
-----
-
-If you don't have Node.js, you can use https://github.com/nvm-sh/nvm[nvm] to install and manage it.
-
-Once you have Node.js installed, run the following command to install the development dependencies:
-
-[,console]
-----
-$ npm i
-----
-
-Now that you have the necessary prerequisites, you can run the tests using the following command:
-
-[,console]
-----
-$ npm test
-----
-
-This command will use Mocha to run all the tests in the _tests/_ folder.
-
-Before submitting any merge request, please run the following scripts to ensure the code is properly formatted:
-
-[,console]
-----
-$ npm run lint && npm run format
-----
-
-If either of these scripts fail, the build will fail.
-However, you need not worry about running them until you are ready to submit your change.
+Thanks in advance for helping to make this project a success!
 
 == Who's using it?
 
@@ -517,3 +485,7 @@ Here's a list of projects using the Antora Lunr extension.
 * https://solr.apache.org/guide/solr/9_0/[Apache Solr Reference Guide]
 
 To add your project to this list, please {url-repo}/-/edit/main/README.adoc[edit this file]!
+
+== Trademarks
+
+AsciiDoc(R) is a trademark of the Eclipse Foundation, Inc.

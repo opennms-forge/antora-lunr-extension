@@ -26,8 +26,9 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "pretest": "npm run build",
-    "build": "npx rollup -c rollup.config.js",
+    "pretest": "npm run compile",
+    "compile": "npx rollup -c rollup.config.js",
+    "build": "npm run compile && npm run lint && npm t",
     "coverage": "nyc npm t",
     "format": "node npm/format.js lib,test,npm,data",
     "lint": "eslint lib test npm data --ext js,mjs",

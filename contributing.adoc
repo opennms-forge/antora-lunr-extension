@@ -1,0 +1,463 @@
+= Contributing
+// Settings
+:toc-title: Contents
+:toclevels: 1
+:toc:
+// Universal gitlab
+:url-gitlab: https://gitlab.com
+:url-gitlab-signin: {url-gitlab}/users/sign_in
+// Project URIs
+:url-org: {url-gitlab}/antora
+:url-project: {url-org}/antora-lunr-extension
+:url-repo: {url-project}.git
+:url-issue-tracker: {url-project}/issues
+:url-issue-labels: {url-project}/labels
+:url-ci-pipelines: {url-project}/pipelines
+:url-members: {url-project}/-/project_members
+// External URLs (alphebetized)
+:url-asciidoc-recommended: https://asciidoctor.org/docs/asciidoc-recommended-practices/#one-sentence-per-line
+:url-chai: http://chaijs.com/api/bdd/
+:url-eslint-ide: https://eslint.org/docs/user-guide/integrations#editors
+:url-git: https://git-scm.com
+:url-git-dl: {url-git}/downloads
+:url-istanbul: https://istanbul.js.org/
+:url-mocha: https://mochajs.org/
+:url-node: https://nodejs.org
+:url-node-releases: {url-node}/en/about/releases/
+:url-nvm: https://github.com/creationix/nvm
+:url-nvm-install: {url-nvm}#installation
+:url-standardjs: https://standardjs.com/
+:url-standardjs-rules: https://standardjs.com/rules.html
+
+== You're Invited!
+
+In the spirit of open source software, *everyone* is welcome to contribute to this project!
+
+We believe strongly that developing software in the open produces the best outcome.
+In order for that to work, the project relies on your support.
+We have big goals for the project and we rely on a variety of talent to achieve those goals.
+
+The best way to get involved is to just show up and make yourself heard.
+We pride ourselves on having a very friendly and encouraging culture.
+
+Whether you're a user, writer, designer, developer, architect, devops, system administrator, advocate, project manager, or just someone with an idea about how to improve the project, we welcome your participation.
+In return, you'll get to use better software that we built together as a community and a great sense of pride for having been a part of making it.
+
+We want your choice to participate in the Antora project to be the start of an exciting and rewarding journey.
+From all of us to you, welcome!
+
+== Project Host
+
+This project is hosted on GitLab under the {url-org}[Antora organization].
+This is the official home of the project.
+All development, project and issue management, and continuous integration is done here.
+
+== Permissions
+
+You do not need a GitLab.com account to browse the issues and merge requests, read the source code and documentation, or view the CI results.
+However, you do need a {url-gitlab-signin}[GitLab.com account] to file an issue and/or submit a merge request.
+
+== Have something to report?
+
+Do you have an idea?
+Have you found an error?
+
+*Antora Lunr Extension is an issue-driven project.*
+
+If you have an idea for an improvement or have discovered an error or omission, head over to the {url-issue-tracker}[issue tracker].
+Review the list of issues to check if someone has already filed an issue about that subject.
+If an issue already exists, we welcome you to join the conversation.
+If an issue doesn't exist, please don't hesitate to create a new one.
+
+If you want to help complete an issue by contributing code, documentation, or other enhancements, review our <<contribution-workflow,contribution workflow>>, then submit a merge request (MR) for review.
+However, please wait until we have agreed on what change to make before submitting an MR.
+This avoids the discussion of the change getting lost and saves maintainers from having to address MRs that aren't relevant.
+
+When thinking about how to contribute, please know that while merge requests are welcome, they aren't the first thing that's needed.
+In fact, submitting a merge request (without prior discussion) can often slow down progress on an issue because it requires the maintainers to stop, review it, and reconcile it with the proposed design.
+What we need more than anything else is help with the requirements and design, which often means making decisions in response to open questions.
+Making those decisions is the exceptionally hard part.
+Once that's done, writing the code becomes straightforward.
+It's either something the maintainers can do or it can serve as an opportunity for someone in the community to contribute code (without the aforementioned disruption).
+
+[#contribution-workflow]
+== Contribution Workflow
+
+*Since Antora Lunr Extension is an issue-driven project, a merge request (MR) should always be linked to an open issue.*
+
+NOTE: One exception to this rule is if you're submitting copy edits to the documentation.
+If you're fixing grammar or typos that don't otherwise change the focus of the content, you can submit an MR directly.
+
+. Review the issue tracker to see if we're already discussing your idea or problem.
+** If you don't see an issue that fits your scenario, then you may create a new one.
+. Discuss what change to make to resolve the issue in the issue comments.
+** Please don't submit an MR before there is an agreement on what change should be made.
+. If you'd like to submit code, documentation or other enhancements for an issue, review the following information first.
+.. Antora Lunr Extension's <<project-rq,fork-branch-commit-MR rules>>
+.. <<code-workflow,Code workflow and requirements>>
+. Fork the project and name your branch after its issue.
+** If you're contributing code, you'll want to <<set-up-workspace,set up your development workspace>>.
+. Write, code, tinker, and have fun!
+** Don't forget to <<lint-rq,lint>> and <<test-rq,test>> your code.
+. When you're ready for feedback, open a MR.
+** On the MR form, you must check the box _Allow commits from members who can merge to the target branch._
+The MR cannot be accepted unless this box is checked.
+If you forget, you can fix it by clicking the Edit button on the MR page.
+
+[#project-rq]
+== Fork, Branch, Commit, and Merge Request Rules
+
+To contribute to the project:
+
+. *Fork the project.*
+We do not accept merge requests that do not come from a dedicated branch in a fork.
+
+. *Create a dedicated branch in your fork for your changes.*
+Name the branch after the issue number it fixes along with a short textual hint.
++
+--
+Here's an example of a branch name for issue #2, which was to initiate the Gulp build:
+
+ issue-2-init-gulp-build
+
+If you're only working on docs, then add `docs/` to the beginning of the branch name.
+Here's an example of a branch name for issue #168, which was to write documentation for the sitemap generation:
+
+ docs/issue-168-document-sitemap
+
+The `docs/` prefix tells the CI server not to run the test suite.
+--
+
+. In the issue tracker, label the issue as *[Progress] Preparing Change* and make sure you're assigned to it so that the rest of the team knows you're working on it.
+If the issue is already assigned but not labeled as being worked on feel free to reassign it to yourself.
+
+. *Make your changes.*
+.. Use as many commits as you think are necessary, but each commit should consist of a logical change.
+.. Write tests to verify each change.
+.. If not already present, add yourself to the list of contributors in the [.path]_package.json_ file for the package you're modifying.
+
+. *Write concise but explicit commit messages.*
+Write the commit message as though the person reading it cannot see the code change.
+.. Write the message in lowercase and imperative tense.
+.. Put the subject on the first line of the commit message (required).
+.. Separate the subject line from the body using a blank line.
+.. The body lines should be structured as an unordered list (Markdown syntax).
+.. In each body line, succinctly identify an important change and/or explain why the change was made (optional).
++
+----
+rename component descriptor filename to antora.yml
+
+- rename component descriptor from docs-component.yml to antora.yml
+- promote component descriptor filename to a constant
+----
+
+. Prior to submitting a MR, *rebase your branch against the main branch*, then push the branch to your fork.
+
+. *Create an MR from your branch* (using the URL shown in the terminal when you push).
+.. *Begin the title of the MR with the issue it resolves* followed by a restatement of the issue.
++
+ resolves #2 initialize gulp build
+
+.. If you're still working on your branch and want feedback on it before it is complete, start the MR with WIP (e.g., `WIP: resolves #2 initialize gulp build`).
+When the MR is ready for final review, you can remove `WIP:` from the MR title using the button in the interface.
+.. In some select cases, the implementation of an issue might be broken up into separate commits if they can be tested and work in isolation.
+This is why only the MR subject mentions the issue being resolved and not the subject of the commit.
+
+. In the issue tracker, mark the issue as *[Progress] In Review*.
+
+. *Your MR must pass the CI pipeline.*
+If it fails, update your MR once you've corrected any problems.
+
+. *A project member will be assigned to your MR and review it.*
+.. During review, a project member may request changes to your MR, either in a comment on the MR or the associated issue.
+.. Checkout the <<mr-approval,MR approval guidelines>> if you want to see how your MR will be evaluated.
+
+. *Append a new commit or rewrite an existing commit*, depending on what you think is most appropriate, if you need to incorporate changes into your MR after you've pushed it.
+
+. When your MR is approved, a project member will merge it using a merge commit with semi-linear history.
+.. The maintainer may decide to squash review commits, or request for you to do so.
+Only original work is guaranteed to be preserved in the commit history.
+
+[#code-workflow]
+== Coding Requirements and Workflow
+
+. Set up your <<set-up-workspace,development workspace>>.
+. Make sure you've forked the project and <<project-rq,named your branch after the issue you're working on>>.
+. Add your code and tests.
+.. Make sure your code adheres to the <<lint-rq,JavaScript standard style and the custom project styles>>.
+.. Make sure you've added tests to verify your code.
+. Run the <<run-tests,test suite>> (which also lints the code) and correct any errors.
+. Commit your changes.
+. Push to your fork and open a merge request.
+
+=== Documentation requirements
+
+. Generally, imitate the style and formatting of what's already written.
+This list is by no means exhaustive.
+. Follow the {url-asciidoc-recommended}[one sentence per line] or "`ventilated prose`" formatting.
+. Paths should be formatted with [.path]\_antora.yml_
+. Reserved words should be formatted with [.term]\*versionless component*
+. Quotes should generally be \"`smart quotes`"
+
+[#lint-rq]
+=== Code structure and style expectations
+
+We read code more than we edit it, so it's important to have consistency throughout the code base.
+
+Antora's JavaScript code must adhere to the {url-standardjs}[JavaScript Standard Style].
+We've modified a few of the standard style rules (e.g., max-len) and added some custom ones (e.g., comma-dangle, arrow-parens).
+The style rules are enforced using eslint with a tailored StandardJS profile.
+
+==== eslint
+
+You can find a {url-standardjs-rules}[list of rules] on the standard JS site.
+We don't use the StandardJS command line tool.
+We use its rules and configuration through ESLint.
+There are {url-eslint-ide}[text editor plugins for ESLint] that you can use, if that's what you prefer.
+We have modified some of the standard rules and added custom rules, which are documented in [.path]_.eslintrc_.
+
+When you <<build-project,build Antora Lunr Extension>>, it will automatically lint (i.e., style check) your JavaScript code.
+
+If you ever want to run the linter separately, you can use the following npm script:
+
+ $ npm run lint
+
+[#set-up-workspace]
+== Development Workspace Setup
+
+This section gives you all the information you need to set up your development workspace and begin hacking on the code.
+
+=== Prerequisites
+
+In order to obtain the source code, run the test suite, and launch Antora, you'll need the following prerequisites:
+
+* git
+* Node.js / npm
+
+The following sections describe the prerequisites in detail and provide resources with additional instructions about how to install them.
+
+==== git
+
+The source code of the project is hosted in a git repository.
+The first software you'll need on your machine is git (command: `git`).
+You'll use git to obtain the source code and push updates to it.
+
+First, check if you have git installed.
+
+ $ git --version
+
+If not, {url-git-dl}[download and install] the git package for your system.
+
+Although Antora doesn't use git at runtime, git is used in the test suite to provide a local git server for testing interactions with remote repositories.
+
+==== Node.js / npm
+
+Antora is built on {url-node}[Node.js] ("`Node`") (command: `node`).
+To work with the project, you must have Node.js installed on your machine.
+The Node.js installation also provides npm (command: `npm`), which you'll use to install additional Node.js modules.
+
+To see which version of Node.js you have installed, open a terminal and type:
+
+ $ node -v
+
+If `node -v` doesn't return any information, you don't yet have Node.js installed.
+
+The minimum required version of Node.js is *16*, as indicated in [.path]_package.json_.
+However, we recommend using the active LTS release (currently Node.js 16).
+These are also the recommended versions of Node.js for development.
+
+If you don't yet have Node.js installed, or the version of Node.js you have isn't Node.js 16 or greater, we strongly recommend using {url-nvm}[nvm] (Node Version Manager) to manage your Node.js installations.
+Follow the {url-nvm-install}[nvm installation instructions] to set up nvm on your machine.
+
+TIP: Many CI environments use nvm to install the version of Node.js used for the build job.
+By using nvm, you can closely align your setup with the environment that is used to generate and publish the production site.
+
+Once you've installed nvm, open a new terminal and install Node.js 16 using:
+
+ $ nvm install 16
+
+The above command will install the latest version of Node.js 16.
+
+If you already have other Node.js versions installed, you can configure Node.js 16 as the default for any new terminal.
+
+ $ nvm alias default 16
+
+You can skip this step if you didn't previously have any Node.js versions installed because `nvm install` automatically adds the default alias to the first version of Node.js you install.
+
+Verify the version of Node.js you have selected using:
+
+ $ node -v
+
+You should also be able to run `npm`:
+
+ $ npm -v
+
+This project uses npm (command: `npm`) to manage various tasks, such as test, lint, format, etc.
+These tasks are defined in [.path]_package.json_.
+You can list the available scripts by running `npm run` without any arguments:
+
+ $ npm run
+
+The rest of the software you need is installable from Node.js (specifically npm).
+
+=== Obtain the Source Code
+
+The next step is to obtain the source code of the project, which you'll do by cloning the git repository.
+*Remember to fork the repository.*
+
+Clone the source repository using:
+
+[subs=attributes+]
+ $ git clone {url-repo} && cd "`basename $_`"
+
+You can copy and paste the above command directly into your terminal.
+The command will clone the repository, then switch to the newly created project folder.
+
+=== Install Dependencies
+
+Initializing the project means downloading and installing the dependencies (i.e., the required software) for the project.
+That's the job of npm.
+
+In your terminal, execute the following command from the root folder of the project:
+
+ $ npm i
+
+The command `i` is shorthand for `install`.
+The install command uses dependency information defined in [.path]_package.json_ and [.path]_package-lock.lock_ to resolve dependencies, which npm then installs inside the project under the [.path]_node_modules/_ folder (and, in some cases, under the [.path]_node_modules/_ folder inside each package).
+
+After pulling the latest source, you may need to update the dependencies.
+It's best to start with a fresh slate by removing the previously install dependencies, then installing them again.
+To do so, run the following commands in sequence:
+
+ $ rm -rf node_modules packages/*/node_modules
+   npm i
+
+NOTE: It's a good idea to run `npm i` each time after you run `git pull` to make sure your dependencies are up to date.
+Running an npm script such as `npm run build` does not install any updated dependencies.
+
+[#build-project]
+=== Build the Project
+
+To build Antora, which means running all the primary tasks, use:
+
+ $ npm run build
+
+To see a list of all available npm scripts, run:
+
+ $ npm run
+
+These commands are covered in the sections that follow.
+
+[#run-tests]
+=== Run the Test Suite
+
+This project uses {url-mocha}[mocha] to run the tests and the assertion library {url-chai}[chai].
+Mocha is configured in [.path]_.mocharc.js_.
+The build script is automatically configured to lint your JavaScript code, which it does before all running the test suite.
+
+To run the test suite, use:
+
+ $ npm run build
+
+
+If you want to generate a coverage report when running the tests (enabled by default in CI), run the `coverage` script instead:
+
+ $ npm run coverage
+
+A coverage report shows the lines, statements, and branches that the tests exercise.
+The report is generated by {url-istanbul}[istanbul] using the nyc command line tool.
+You can view the coverage report by opening the HTML file [.path]_reports/lcov-report/index.html_ in your browser.
+
+[TIP]
+====
+To clear the coverage report and related cache files from a previous run, use:
+
+ $ rm -rf reports .nyc_output node_modules/.cache/nyc
+====
+
+If you don't want the `lint` script to run when running tests, call the `test` lifecycle script directly:
+
+ $ npm test
+
+TIP: The command `npm test` is a shorthand for `npm run test` and can be further abbreviated as `npm t`.
+
+If you want to run the linter separately, use the following npm script:
+
+ $ npm run lint
+
+[#run-dev-version]
+=== Run the development version
+
+After fixing critical bugs or implementing your wonderful new feature, you'll probably want to test out your local Antora Lunr Extension version on your projects.
+
+The most convenient way to run your development code is to point to your local copy in your Antora playbook:
+
+[,yaml]
+----
+antora:
+  extensions:
+  - '/path/to/antora-lunr-extension'
+----
+
+IMPORTANT: Do not forget to <<build-project, build the project>> and run your playbook again after making a change to your local copy.
+
+=== Continuous Integration
+
+Both the linter and the test suite are run in a continuous integration (CI) environment on every commit to the main branch and on every merge request.
+A merge request cannot be merged unless the CI pipeline succeeds.
+
+The CI pipeline is run in the https://docs.gitlab.com/ce/ci/[GitLab CI] environment using the https://store.docker.com/images/node[node:16] docker image.
+
+The stages, as well as any global configuration settings, are defined in the [.path]_.gitlab-ci.yml_ file at the root of the project.
+The CI pipeline essentially boils down to these three commands:
+
+* `npm i`
+* `npm run lint`
+* `npm test` (or `npm run coverage`)
+
+You can view the results of the pipelines on the {url-ci-pipelines}[pipelines dashboard].
+
+==== Skip the CI Pipeline
+
+If you need to make a change to the repository without triggering the CI pipeline, add `[skip ci]` to the end of your last commit message.
+For example:
+
+ fix typo in README [skip ci]
+
+This flag is reserved for small, non-software changes, as suggested by the example.
+
+== Project Maintainers
+
+The project maintainers are responsible for:
+
+* managing organization and project permissions
+* managing the community and code of conduct
+* setting ADR statuses
+* merging requests into the main branch
+* managing and releasing the pipeline
+
+[#mr-approval]
+=== Merge Request Review and Approval Guidelines
+
+Each merge request is assigned at least one reviewer.
+The reviewer is responsible for making sure the MR meets the project and issue criteria, for answering questions the contributor may have regarding the MR, and for suggesting ways the MR can be improved if necessary.
+
+*The MR should not be approved if*:
+
+* there was no agreement about what change to make in the linked issue
+* it fails the CI pipeline
+* it doesn't meet the project's workflow, code, test or documentation requirements
+* it doesn't meet the acceptance criteria of its associated issue
+
+*If the MR needs to be modified, notify the contributor and add helpful information to the MR or the issue*.
+Once the contributor has modified the MR, evaluate it again.
+
+When the MR meets the project and issue criteria, it can be merged into the main branch.
+*When the branch is ready to be merged into the main branch*:
+
+* Rebase the MR if necessary.
+* Modify the commit message(s) if necessary.
+* Check _remove source branch_.
+* Don't squash the commits, except in especially messy-weird situations.
+** The maintainer only guarantees to preserve the original work in the MR.
+* Press _Merge_.
