@@ -269,6 +269,9 @@ function debounce (func, wait, immediate) {
 }
 
 function enableSearchInput (enabled) {
+  if (facetFilterInput) {
+    facetFilterInput.disabled = !enabled
+  }
   searchInput.disabled = !enabled
   searchInput.title = enabled ? '' : 'Loading index...'
 }
