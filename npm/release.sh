@@ -75,6 +75,8 @@ echo -e "access=public\ntag=$RELEASE_NPM_TAG\n//registry.npmjs.org/:_authToken=\
     sed -i "s/^tag=$RELEASE_NPM_TAG$/tag=latest/" .npmrc
   fi
   git push origin $(git describe --tags --exact-match)
+  npm i
+  npm run compile 
   npm publish
   git push origin $RELEASE_BRANCH
 )
