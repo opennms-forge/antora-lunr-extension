@@ -4,6 +4,15 @@
 This document provides a summary of all notable changes to this project grouped by release.
 For a detailed view of what's changed, refer to the {url-repo}/commits[commit history] of this project.
 
+== Unreleased
+
+
+== 1.0.0-alpha.8 (2022-05-23)
+
+=== Fixed
+
+* Compile `search-ui.js` before releasing
+
 == 1.0.0-alpha.7 (2022-05-23)
 
 === Fixed
