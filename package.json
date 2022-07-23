@@ -55,7 +55,7 @@
     "lunr-languages": "~1.9"
   },
   "devDependencies": {
-    "@antora/site-generator": "3.0.0-rc.2",
+    "@antora/site-generator": "3.0.3",
     "chai": "~4.3",
     "chai-fs": "~2.0",
     "dirty-chai": "~2.0",
