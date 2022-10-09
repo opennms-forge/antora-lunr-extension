@@ -52,7 +52,7 @@
     "cheerio": "1.0.0-rc.10",
     "html-entities": "~2.3",
     "lunr": "~2.3",
-    "lunr-languages": "~1.9"
+    "lunr-languages": "~1.10"
   },
   "devDependencies": {
     "@antora/site-generator": "3.0.3",

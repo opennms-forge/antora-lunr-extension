@@ -9,6 +9,7 @@ For a detailed view of what's changed, refer to the {url-repo}/commits[commit hi
 === Changed
 
 * Remove workaround for #44 now that streams can safely be written to multiple destinations starting in Antora 3.0.3
+* upgrade lunr-languages from 1.9 to 1.10; changes nodejieba dependency to @node-rs/jieba (#60)
 
 == 1.0.0-alpha.8 (2022-05-23)
 

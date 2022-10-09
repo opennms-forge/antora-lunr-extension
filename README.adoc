@@ -321,7 +321,7 @@ You can add support for the following other languages:
 * image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/TR.png[tr] Turkish (tr)
 * image:https://cdn.jsdelivr.net/gh/madebybowtie/FlagKit/Assets/PNG/VN.png[vi] Vietnamese (vi)
 
-NOTE: To use Chinese as your language, you must install the `nodejieba` dependency (i.e., `npm i nodejieba`).
+NOTE: To use Chinese as your language, you must install the `@node-rs/jieba` dependency (i.e., `npm i @node-rs/jieba`).
 
 To use one or more languages, set the `languages` configuration key with all the desired language codes as a list:
 
