@@ -1,24 +1,24 @@
 #!/bin/bash
 
-PACKAGE_NAME=$(node -p 'require("./package.json").name')
-if [ -z $RELEASE_DEPLOY_KEY ]; then
+# set up variables
+if [ -z "$RELEASE_DEPLOY_KEY" ]; then
   declare -n RELEASE_DEPLOY_KEY="RELEASE_DEPLOY_KEY_$GITLAB_USER_LOGIN"
-  if [ -z $RELEASE_DEPLOY_KEY ]; then
-    echo No release deploy key \(RELEASE_DEPLOY_KEY or RELEASE_DEPLOY_KEY_$GITLAB_USER_LOGIN\) defined. Aborting.
+  if [ -z "$RELEASE_DEPLOY_KEY" ]; then
+    echo No release deploy key \(RELEASE_DEPLOY_KEY or RELEASE_DEPLOY_KEY_$GITLAB_USER_LOGIN\) defined. Halting release.
     exit 1
   fi
 fi
-if [ -z $RELEASE_NPM_TOKEN ]; then
+if [ -z "$RELEASE_NPM_TOKEN" ]; then
   declare -n RELEASE_NPM_TOKEN="RELEASE_NPM_TOKEN_$GITLAB_USER_LOGIN"
-  if [ -z $RELEASE_NPM_TOKEN ]; then
-    echo No release npm token \(RELEASE_NPM_TOKEN or RELEASE_NPM_TOKEN_$GITLAB_USER_LOGIN\) defined. Aborting.
+  if [ -z "$RELEASE_NPM_TOKEN" ]; then
+    echo No release npm token \(RELEASE_NPM_TOKEN or RELEASE_NPM_TOKEN_$GITLAB_USER_LOGIN\) defined. Halting release.
     exit 1
   fi
 fi
-RELEASE_BRANCH=$CI_COMMIT_BRANCH
+RELEASE_BRANCH=${CI_COMMIT_BRANCH:-main}
 # RELEASE_VERSION can be a version number (exact) or increment keyword (next in sequence)
-if [ -z $RELEASE_VERSION ]; then RELEASE_VERSION=prerelease; fi
-if [ -z $RELEASE_NPM_TAG ]; then
+if [ -z "$RELEASE_VERSION" ]; then RELEASE_VERSION=prerelease; fi
+if [ -z "$RELEASE_NPM_TAG" ]; then
   if case $RELEASE_VERSION in major|minor|patch) ;; *) false;; esac; then
     RELEASE_NPM_TAG=latest
   elif case $RELEASE_VERSION in pre*) ;; *) false;; esac; then
@@ -29,12 +29,6 @@ if [ -z $RELEASE_NPM_TAG ]; then
     RELEASE_NPM_TAG=latest
   fi
 fi
-
-rm -rf build
-
-# make sure the release branch exists as a local branch
-git fetch origin
-git branch -f $RELEASE_BRANCH origin/$RELEASE_BRANCH
 
 # set up SSH auth using ssh-agent
 mkdir -p -m 700 $HOME/.ssh
@@ -52,45 +46,45 @@ if [ $exit_code -gt 0 ]; then
 fi
 echo Deploy key identity added to SSH agent.
 
-# clone the branch from which we're releasing
-git clone -b $RELEASE_BRANCH --no-local . build/$PACKAGE_NAME
-
-# switch to clone
-cd build/$PACKAGE_NAME
-git status -s -b
-
 # configure git to push changes
-git remote set-url origin "git@gitlab.com:$CI_PROJECT_PATH.git"
-git config user.email "$GITLAB_USER_EMAIL"
-git config user.name "$GITLAB_USER_NAME"
+git config --local user.name "$GITLAB_USER_NAME"
+git config --local user.email "$GITLAB_USER_EMAIL"
+git remote set-url origin git@gitlab.com:$CI_PROJECT_PATH.git
+git fetch --depth ${GIT_DEPTH:-5} --update-shallow origin $RELEASE_BRANCH
+
+# make sure the release branch exists as a local branch
+git checkout -b $RELEASE_BRANCH -t origin/$RELEASE_BRANCH
+
+if [ "$(git rev-parse $RELEASE_BRANCH)" != "$CI_COMMIT_SHA" ]; then
+  echo $RELEASE_BRANCH moved forward from $CI_COMMIT_SHA. Halting release.
+  exit 1
+fi
 
 # configure npm client for publishing
-echo -e "access=public\ntag=$RELEASE_NPM_TAG\n//registry.npmjs.org/:_authToken=\"$RELEASE_NPM_TOKEN\"" > .npmrc
+echo -e "//registry.npmjs.org/:_authToken=$RELEASE_NPM_TOKEN" > $HOME/.npmrc
 
 # release!
 (
   set -e
-  npm version -m v%s $RELEASE_VERSION
-  if case $(node -p 'require("./package.json").version') in 1.0.0-*) ;; *) false;; esac; then
-    sed -i "s/^tag=$RELEASE_NPM_TAG$/tag=latest/" .npmrc
+  npm version --no-git-tag-version $RELEASE_VERSION
+  RELEASE_VERSION=$(npm exec -c 'echo -n $npm_package_version')
+  if case $RELEASE_VERSION in 1.0.0-*) ;; *) false;; esac; then
+    RELEASE_NPM_TAG=latest
   fi
+  git commit -a -m "release $RELEASE_VERSION [skip ci]"
+  git tag -m "version $RELEASE_VERSION" v$RELEASE_VERSION
   git push origin $(git describe --tags --exact-match)
-  npm i
-  npm run compile 
-  npm publish
+  npx -y rollup -c rollup.config.js
+  npm publish --access public --tag $RELEASE_NPM_TAG
   git push origin $RELEASE_BRANCH
 )
 
 exit_code=$?
 
 # nuke npm settings
-unlink .npmrc
+rm -f $HOME/.npmrc
 
 git status -s -b
-
-# nuke clone
-cd -
-rm -rf build
 
 # kill the ssh-agent
 eval $(ssh-agent -k) >/dev/null
