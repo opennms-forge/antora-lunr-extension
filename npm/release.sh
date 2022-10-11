@@ -72,10 +72,15 @@ echo -e "//registry.npmjs.org/:_authToken=$RELEASE_NPM_TOKEN" > $HOME/.npmrc
     RELEASE_NPM_TAG=latest
   fi
   git commit -a -m "release $RELEASE_VERSION [skip ci]"
+  HEAD_COMMIT=$(git rev-parse HEAD)
+  npx -y rollup -c rollup.config.js
+  sed -i '/^\(#\|\/data\/\)/d' .gitignore
+  git add .gitignore data
+  git commit -m 'add dist files for npm package'
   git tag -m "version $RELEASE_VERSION" v$RELEASE_VERSION
   git push origin $(git describe --tags --exact-match)
-  npx -y rollup -c rollup.config.js
   npm publish --access public --tag $RELEASE_NPM_TAG
+  git reset --hard $HEAD_COMMIT
   git push origin $RELEASE_BRANCH
 )
 

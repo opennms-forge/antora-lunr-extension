@@ -1,9 +1,7 @@
 'use strict'
 
-const { exec } = require('child_process')
 const { promises: fsp } = require('fs')
 const ospath = require('path')
-const { promisify } = require('util')
 const { version: VERSION } = require('../package.json')
 
 const PROJECT_ROOT_DIR = ospath.join(__dirname, '..')
@@ -21,7 +19,6 @@ function updateChangelog (now) {
     .then((changelog) =>
       fsp.writeFile(CHANGELOG_FILE, changelog.replace(/^== Unreleased$/m, `== ${VERSION} (${releaseDate})`))
     )
-    .then(() => promisify(exec)('git add CHANGELOG.adoc', { cwd: PROJECT_ROOT_DIR }))
 }
 
 ;(async () => {
