@@ -7,8 +7,8 @@ variables:
   GIT_DEPTH: '5'
   DEFAULT_NODE_VERSION: '16'
   LINUX_DISTRO: bullseye
+  NPM_CONFIG_AUDIT: 'false'
   NPM_CONFIG_CACHE: &npm_cache_dir .cache/npm
-  NPM_CONFIG_FUND: 'false'
   NPM_CONFIG_PREFER_OFFLINE: 'true'
   RELEASE_VERSION:
     value: ''
@@ -16,7 +16,7 @@ variables:
 default:
   image: node:$DEFAULT_NODE_VERSION-$LINUX_DISTRO
   interruptible: true
-.rules:
+.defs:
 - &if_docs_mr
   rules:
   - if: &docs_mr $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^docs\//
@@ -27,6 +27,17 @@ default:
   - if: $CI_JOB_NAME == 'lint' && $CI_PIPELINE_SOURCE == 'push' && $CI_PROJECT_PATH != 'antora/antora-lunr-extension'
     when: manual
   - when: on_success
+- &platform_info node -p '`${os.type()} ${os.release()}\nNode.js ${process.version}`'
+- &save_report_artifacts
+  artifacts:
+    when: always
+    paths:
+    - reports/lcov-report
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: reports/cobertura-coverage.xml
+      junit: reports/tests-xunit.xml
 - &if_release
   rules:
   - if: $CI_PIPELINE_SOURCE == 'web' && $CI_PROJECT_PATH == 'antora/antora-lunr-extension' && $CI_COMMIT_BRANCH && $CI_COMMIT_REF_PROTECTED && $RELEASE_VERSION
@@ -34,15 +45,19 @@ default:
   stage: test
   <<: *unless_docs_mr
   before_script:
-  - node -p '`${os.type()} ${os.release()}\nNode.js ${process.version}`'
-  - npm ci --quiet
+  - *platform_info
+  - npm ci --audit --quiet
   cache: &npm_cache
     key: npm-cache
     paths:
     - *npm_cache_dir
     policy: pull
-  script:
-  - npm test
+  script: npm test
+# this job signals success to the MR UI
+docs:
+  stage: test
+  <<: *if_docs_mr
+  script: echo 'we love docs!'
 # this job also seeds the dependency cache
 lint:
   extends: .npm
@@ -53,33 +68,23 @@ lint:
   script:
   - npm run lint
   - if [ -n "$(npm --silent run format && git --no-pager diff --name-only)" ]; then git --no-pager diff && false; fi
-# this job signals success to the MR UI
-docs:
-  stage: test
-  <<: *if_docs_mr
-  script: echo 'we love docs!'
 test:node-16-linux:
   extends: .npm
-  script:
-  - npm run coverage
+  script: npm run coverage
   coverage: '/^All files *[|] *([0-9.]+) *[|]/'
-  artifacts:
-    when: always
-    expose_as: coverage-report
-    paths:
-    - reports/lcov-report
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: reports/cobertura-coverage.xml
-      junit: reports/tests-xunit.xml
-test:node-17-linux:
+  <<: *save_report_artifacts
+test:node-18-linux:
   extends: .npm
-  image: node:17-$LINUX_DISTRO
-  artifacts:
-    when: always
-    reports:
-      junit: reports/tests-xunit.xml
+  image: node:18-$LINUX_DISTRO
+test:windows:
+  extends: .npm
+  tags: [windows]
+  # cache does not currently work with the shared Windows runner
+  cache: []
+  before_script:
+  - choco upgrade -y nodejs --version=16.17.0
+  - *platform_info
+  - npm ci --quiet
 release:
   stage: deploy
   interruptible: false
@@ -87,12 +92,3 @@ release:
   <<: *if_release
   script:
   - npm/release.sh
-test:windows:
-  extends: .npm
-  tags:
-    - windows
-    - exoscale
-  artifacts:
-    when: always
-    reports:
-      junit: reports/tests-xunit.xml
