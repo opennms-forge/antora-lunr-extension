@@ -742,6 +742,48 @@ describe('generateIndex()', () => {
     )
   })
 
+  it('should index keywords', () => {
+    playbook.urls = { htmlExtensionStyle: 'indexify' }
+    const contentCatalog = buildContentCatalog(playbook, [
+      {
+        contents: Buffer.from(`
+          <html lang="en">
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width,initial-scale=1">
+              <title>Antora Documentation :: Antora Docs</title>
+              <meta name="generator" content="Antora 2.0.0">
+            </head>
+            <body class="article">
+              <main role="main">
+                <article class="doc">
+                  <h1 class="page">Antora Documentation</h1>
+                </article>
+              </main>
+            </body>
+          </html>`),
+        src: {
+          component: 'hello',
+          version: '1.0',
+        },
+        asciidoc: {
+          attributes: {
+            keywords: 'keyword1, lorem ipsum, keyword2',
+          },
+        },
+      },
+    ])
+    const index = generateIndex(playbook, contentCatalog)
+    const searchResultItems1 = index.index.search('keyword2')
+    expect(searchResultItems1, 'keyword must be found').to.have.lengthOf(1)
+
+    const searchResultItems2 = index.index.search('keyword:keyword1')
+    expect(
+      searchResultItems2,
+      'keyword must be found found in field keyword'
+    ).to.have.lengthOf(1)
+  })
+
   describe('Paths', () => {
     it('should use relative links when site URL is not defined', () => {
       delete playbook.site.url

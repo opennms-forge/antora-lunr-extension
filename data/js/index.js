@@ -35,6 +35,15 @@ function highlightSectionTitle (sectionTitle, terms) {
   return []
 }
 
+function highlightKeyword (doc, terms) {
+  const keyword = doc.keyword
+  if (keyword) {
+    const positions = getTermPosition(keyword, terms)
+    return buildHighlightedText(keyword, positions, snippetLength)
+  }
+  return []
+}
+
 function highlightText (doc, terms) {
   const text = doc.text
   const positions = getTermPosition(text, terms)
@@ -65,6 +74,7 @@ function highlightHit (searchMetadata, sectionTitle, doc) {
     pageTitleNodes: highlightPageTitle(doc.title, terms.title || []),
     sectionTitleNodes: highlightSectionTitle(sectionTitle, terms.title || []),
     pageContentNodes: highlightText(doc, terms.text || []),
+    pageKeywordNodes: highlightKeyword(doc, terms.keyword || []),
   }
 }
 
@@ -120,29 +130,24 @@ function createSearchResultItem (doc, sectionTitle, item, highlightingResult) {
     const documentSectionTitle = document.createElement('div')
     documentSectionTitle.classList.add('search-result-section-title')
     documentHitLink.appendChild(documentSectionTitle)
-    highlightingResult.sectionTitleNodes.forEach(function (node) {
-      let element
-      if (node.type === 'text') {
-        element = document.createTextNode(node.text)
-      } else {
-        element = document.createElement('span')
-        element.classList.add('search-result-highlight')
-        element.innerText = node.text
-      }
-      documentSectionTitle.appendChild(element)
-    })
+    highlightingResult.sectionTitleNodes.forEach((node) => createHighlightedText(node, documentSectionTitle))
   }
-  highlightingResult.pageContentNodes.forEach(function (node) {
-    let element
-    if (node.type === 'text') {
-      element = document.createTextNode(node.text)
-    } else {
-      element = document.createElement('span')
-      element.classList.add('search-result-highlight')
-      element.innerText = node.text
-    }
-    documentHitLink.appendChild(element)
-  })
+  highlightingResult.pageContentNodes.forEach((node) => createHighlightedText(node, documentHitLink))
+
+  // only show keyword when we got a hit on them
+  if (doc.keyword && highlightingResult.pageKeywordNodes.length > 1) {
+    const documentKeywords = document.createElement('div')
+    documentKeywords.classList.add('search-result-keywords')
+    const documentKeywordsFieldLabel = document.createElement('span')
+    documentKeywordsFieldLabel.classList.add('search-result-keywords-field-label')
+    documentKeywordsFieldLabel.innerText = 'keywords: '
+    const documentKeywordsList = document.createElement('span')
+    documentKeywordsList.classList.add('search-result-keywords-list')
+    highlightingResult.pageKeywordNodes.forEach((node) => createHighlightedText(node, documentKeywordsList))
+    documentKeywords.appendChild(documentKeywordsFieldLabel)
+    documentKeywords.appendChild(documentKeywordsList)
+    documentHitLink.appendChild(documentKeywords)
+  }
   const searchResultItem = document.createElement('div')
   searchResultItem.classList.add('search-result-item')
   searchResultItem.appendChild(documentTitle)
@@ -151,6 +156,25 @@ function createSearchResultItem (doc, sectionTitle, item, highlightingResult) {
     e.preventDefault()
   })
   return searchResultItem
+}
+
+/**
+ * Creates an element from a highlightingResultNode and add it to the targetNode.
+ * @param {Object} highlightingResultNode
+ * @param {String} highlightingResultNode.type - type of the node
+ * @param {String} highlightingResultNode.text
+ * @param {Node} targetNode
+ */
+function createHighlightedText (highlightingResultNode, targetNode) {
+  let element
+  if (highlightingResultNode.type === 'text') {
+    element = document.createTextNode(highlightingResultNode.text)
+  } else {
+    element = document.createElement('span')
+    element.classList.add('search-result-highlight')
+    element.innerText = highlightingResultNode.text
+  }
+  targetNode.appendChild(element)
 }
 
 function createNoResult (text) {

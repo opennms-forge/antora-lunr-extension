@@ -1,5 +1,15 @@
 'use strict'
 
+/**
+ * Splitting the text by the given positions.
+ * The text within the positions getting the type "mark", all other text gets the type "text".
+ * @param {string} text
+ * @param {Object[]} positions
+ * @param {number} positions.start
+ * @param {number} positions.length
+ * @param {number} snippetLength Maximum text length for text in the result.
+ * @returns {[{text: string, type: string}]}
+ */
 export function buildHighlightedText (text, positions, snippetLength) {
   const textLength = text.length
   const validPositions = positions

@@ -1,4 +1,5 @@
 = Page Title
+:keywords: keyword1, keyword2
 
 This is the content.
 
