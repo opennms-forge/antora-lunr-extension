@@ -78,7 +78,7 @@ function highlightHit (searchMetadata, sectionTitle, doc) {
   }
 }
 
-function createSearchResult (result, store, searchResultDataset) {
+function createSearchResult (result, store, searchResultDataset, query) {
   let currentComponent
   result.forEach(function (item) {
     const ids = item.ref.split('-')
@@ -103,11 +103,11 @@ function createSearchResult (result, store, searchResultDataset) {
       searchResultDataset.appendChild(searchResultComponentHeader)
       currentComponent = componentVersion
     }
-    searchResultDataset.appendChild(createSearchResultItem(doc, sectionTitle, item, highlightingResult))
+    searchResultDataset.appendChild(createSearchResultItem(doc, sectionTitle, item, highlightingResult, query))
   })
 }
 
-function createSearchResultItem (doc, sectionTitle, item, highlightingResult) {
+function createSearchResultItem (doc, sectionTitle, item, highlightingResult, query) {
   const documentTitle = document.createElement('div')
   documentTitle.classList.add('search-result-document-title')
   highlightingResult.pageTitleNodes.forEach(function (node) {
@@ -124,7 +124,12 @@ function createSearchResultItem (doc, sectionTitle, item, highlightingResult) {
   const documentHit = document.createElement('div')
   documentHit.classList.add('search-result-document-hit')
   const documentHitLink = document.createElement('a')
-  documentHitLink.href = siteRootPath + doc.url + (sectionTitle ? '#' + sectionTitle.hash : '')
+  const url = new URL(siteRootPath + doc.url, window.location.href)
+  if (sectionTitle) {
+    url.hash = '#' + sectionTitle.hash
+  }
+  url.searchParams.set('q', query)
+  documentHitLink.href = url.href
   documentHit.appendChild(documentHitLink)
   if (highlightingResult.sectionTitleNodes.length > 0) {
     const documentSectionTitle = document.createElement('div')
@@ -266,7 +271,7 @@ function searchIndex (index, store, text) {
   searchResultDataset.classList.add('search-result-dataset')
   searchResultContainer.appendChild(searchResultDataset)
   if (result.length > 0) {
-    createSearchResult(result, store, searchResultDataset)
+    createSearchResult(result, store, searchResultDataset, text)
   } else {
     searchResultDataset.appendChild(createNoResult(text))
   }
@@ -328,6 +333,136 @@ function toggleFilter (e, index) {
   }
 }
 
+function highliteMatches (index) {
+  const params = new URLSearchParams(window.location.search.slice(1))
+  const query = params.get('q')
+  if (query !== null) {
+    search(index.index, index.store.documents, query)
+      .map((entry) => [entry.matchData.metadata, index.store.documents[entry.ref.split('-')[0]]])
+      .filter(([meta, doc]) => new URL(doc.url, window.location.href).pathname === window.location.pathname)
+      .forEach(([meta, doc]) => {
+        Object.keys(meta).forEach(function (term) {
+          Object.keys(meta[term]).forEach(function (field) {
+            const positions = meta[term][field].position.sort((a, b) => a[0] - b[0]).slice()
+
+            const element = document.querySelector('article.doc')
+
+            if (field === 'title') {
+              const hash = new URL(doc.url, window.location.href).hash
+
+              const node =
+                hash === undefined || hash === ''
+                  ? element.querySelector('h1') // Find the main title
+                  : document.getElementById(hash.slice(1)) // Find the sub-title
+
+              if (node !== undefined) {
+                positions.forEach((match) => {
+                  // Define range of match in relation to current node
+                  const range = document.createRange()
+                  range.setStart(node.lastChild, match[0])
+                  range.setEnd(node.lastChild, match[0] + match[1])
+
+                  // Create marking element
+                  const tag = document.createElement('mark')
+                  tag.dataset.matchStart = match[0]
+                  tag.dataset.matchLen = match[1]
+
+                  // Insert marking element
+                  range.surroundContents(tag)
+                })
+              }
+            } else if (field === 'text') {
+              // Walk the article but remove titles, navigation and toc
+              const walker = document.createTreeWalker(element, window.NodeFilter.SHOW_TEXT, (node) => {
+                if (node.parentElement.matches('article.doc aside.toc')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc aside.toc *')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc nav.pagination')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc nav.pagination *')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h1')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h1 *')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h2')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h2 *')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h3')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h3 *')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h4')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h4 *')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h5')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h5 *')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h6')) return window.NodeFilter.FILTER_SKIP
+                if (node.parentElement.matches('article.doc h6 *')) return window.NodeFilter.FILTER_SKIP
+                return window.NodeFilter.FILTER_ACCEPT
+              })
+
+              let index = -1 // Ignore first encountered blank
+              let blank = true // Start in blank mode to trim of leading blank
+
+              let match = positions.shift()
+
+              let node
+              while ((node = walker.nextNode()) === undefined) {
+                if (match === undefined) break
+
+                let text = node.textContent
+                if (text === '') {
+                  continue
+                }
+
+                // If node is blank, remeber and skip
+                if (/^[\t\n\r ]$/.test(text)) {
+                  blank = true
+                  continue
+                }
+
+                // If node does not starts with blank but a blank has been encountered before, insert it
+                if (blank && !/^[\t\n\r ]/.test(text)) {
+                  index += 1
+                }
+
+                // Reset blank status
+                blank = false
+
+                // Check if match is part of this node
+                if (match[0] < index + text.length) {
+                  // Define range of match in relation to current node
+                  const range = document.createRange()
+                  range.setStart(node, match[0] - index)
+                  range.setEnd(node, match[0] + match[1] - index)
+
+                  // Create marking element
+                  const tag = document.createElement('mark')
+                  tag.dataset.matchStart = match[0]
+                  tag.dataset.matchLen = match[1]
+
+                  // Insert marking element
+                  range.surroundContents(tag)
+
+                  // Move index to end of match, which is the same as the end of the marking element
+                  index = match[0] + match[1]
+
+                  // Pop next node from walker - which is the element we've just added
+                  walker.nextNode()
+
+                  // Move to next match
+                  match = positions.shift()
+
+                  continue
+                }
+
+                // Remember if node ends with blank
+                if (/[\t\n\r ]$/.test(text)) {
+                  blank = true
+                  text = text.trimEnd()
+                }
+
+                index += text.length
+              }
+            }
+          })
+        })
+      })
+  }
+}
+
 export function initSearch (lunr, data) {
   const start = performance.now()
   const index = { index: lunr.Index.load(data.index), store: data.store }
@@ -353,6 +488,8 @@ export function initSearch (lunr, data) {
     facetFilterInput.addEventListener('change', (e) => toggleFilter(e, index))
   }
   document.documentElement.addEventListener('click', clearSearchResults)
+
+  highliteMatches(index)
 }
 
 // disable the search input until the index is loaded
